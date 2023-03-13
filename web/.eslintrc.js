@@ -45,6 +45,14 @@ module.exports = {
       ignoreRestSiblings: true
     }],
     'quote-props': ['error', 'as-needed'],
+    'react/self-closing-comp': ['error', {
+      component: true,
+      html: true
+    }],
+    indent: ['error', 2],
+    'react/jsx-max-props-per-line': ['error', { maximum: { single: 2, multi:  1 }}],
+    'react/jsx-first-prop-new-line':['error', 'multiline-multiprop'],
+    'react/jsx-closing-bracket-location': ['error', 'line-aligned'],
 
     'react/react-in-jsx-scope': 'off'
   }
