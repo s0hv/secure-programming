@@ -12,6 +12,8 @@ specifiers:
   '@types/react-dom': 18.0.11
   eslint: 8.36.0
   eslint-config-next: 13.2.4
+  eslint-plugin-react: ^7.32.2
+  eslint-plugin-react-hooks: ^4.6.0
   next: 13.2.4
   react: 18.2.0
   react-dom: 18.2.0
@@ -30,6 +32,8 @@ dependencies:
   '@types/react-dom': 18.0.11
   eslint: 8.36.0
   eslint-config-next: 13.2.4_vgl77cfdswitgr47lm5swmv43m
+  eslint-plugin-react: 7.32.2_eslint@8.36.0
+  eslint-plugin-react-hooks: 4.6.0_eslint@8.36.0
   next: 13.2.4_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
