@@ -1,35 +1,35 @@
 import Head from 'next/head';
 import { Box, Button, Container, Link, TextField, Typography } from '@mui/material';
-import { FC } from "react";
+import { FC } from 'react';
 
 const SignUpForm: FC = () => {
-   return <>
-       <Typography
-            variant='h4'
-            sx={{ mb: 2 }}
-          >
+  return <>
+    <Typography
+      variant='h4'
+      sx={{ mb: 2 }}
+    >
                   Sign up
-          </Typography>
-          <TextField
-            name='username'
-            label='Username'
-            sx={{ mb: 1 }}
-          />
-          <TextField
-            name='password'
-            type='password'
-            label='Password'
-            sx={{ mb: 1 }}
-          />
-          <TextField
-            name='email'
-            label='Email'
-            sx={{ mb: 1 }}
-          />
-          <Button>Sign up</Button>
+    </Typography>
+    <TextField
+      name='username'
+      label='Username'
+      sx={{ mb: 1 }}
+    />
+    <TextField
+      name='password'
+      type='password'
+      label='Password'
+      sx={{ mb: 1 }}
+    />
+    <TextField
+      name='email'
+      label='Email'
+      sx={{ mb: 1 }}
+    />
+    <Button>Sign up</Button>
 
-   </>
-}
+  </>;
+};
 export default function Signup() {
   return (
     <>
