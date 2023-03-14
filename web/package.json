@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next export",
-    "eslint": "eslint --ext .jsx,.js,.ts,.tsx ."
+    "eslint": "eslint --ext .jsx,.js,.ts,.tsx .",
+    "eslint:fix": "eslint --ext .jsx,.js,.ts,.tsx --fix ."
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
@@ -16,6 +17,7 @@
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.6",
     "@mui/material": "^5.11.12",
+    "@mui/system": "^5.11.12",
     "@next/font": "^13.2.4",
     "@types/node": "18.15.1",
     "@types/react": "18.0.28",
