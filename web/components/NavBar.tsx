@@ -9,7 +9,7 @@ const NavBar: FC = () => {
       mb: 4
     }}
     >
-      <AppBar position='static'>
+      <AppBar position='fixed'>
         <Toolbar>
           <Typography
             variant='h6'
@@ -21,9 +21,10 @@ const NavBar: FC = () => {
           <Button color='inherit' href='/login'>Login</Button>
           <Button color='inherit' href='/signup'>Sign up</Button>
           <Button color='inherit' href='/profile'>Profile</Button>
-          <Button color='inherit' href='/index'>Logout</Button>
+          <Button color='inherit' href='/'>Logout</Button>
         </Toolbar>
       </AppBar>
+      <Toolbar/>
     </Box>
   );
 };
