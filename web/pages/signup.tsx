@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { Box, Button, Container, Link, TextField, Typography } from '@mui/material';
 import { FC } from 'react';
+import { NavBar } from '@/components/NavBar';
 
 const SignUpForm: FC = () => {
   return <>
@@ -26,7 +27,7 @@ const SignUpForm: FC = () => {
       label='Email'
       sx={{ mb: 1 }}
     />
-    <Button>Sign up</Button>
+    <Button variant='contained'>Sign up</Button>
 
   </>;
 };
@@ -36,6 +37,7 @@ export default function Signup() {
       <Head>
         <title>Sign up for App</title>
       </Head>
+      <NavBar/>
       <Container
         component='main'
         maxWidth='xs'
@@ -45,6 +47,9 @@ export default function Signup() {
           display='flex'
           flexDirection='column'
           component='form'
+          sx={{
+            mb: 2
+          }}
         >
           <SignUpForm/>
         </Box>

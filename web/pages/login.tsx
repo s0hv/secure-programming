@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { Box, Button, Container, Link, TextField, Typography } from '@mui/material';
 import { FC } from 'react';
+import { NavBar } from '@/components/NavBar';
 
 const LoginForm: FC = () => {
   return <>
@@ -21,7 +22,7 @@ const LoginForm: FC = () => {
       label='Password'
       sx={{ mb: 1 }}
     />
-    <Button>Log in</Button>
+    <Button variant='contained'>Log in</Button>
   </>;
 };
 
@@ -31,6 +32,7 @@ export default function Login() {
       <Head>
         <title>Log into App</title>
       </Head>
+      <NavBar/>
       <Container
         component='main'
         maxWidth='xs'
@@ -40,6 +42,9 @@ export default function Login() {
           display='flex'
           flexDirection='column'
           component='form'
+          sx={{
+            mb: 2
+          }}
         >
           <LoginForm/>
         </Box>

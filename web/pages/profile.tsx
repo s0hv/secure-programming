@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { FC } from 'react';
 import { Stack } from '@mui/system';
+import { NavBar } from '@/components/NavBar';
 
 
 const PasswordChange: FC = () => {
@@ -47,6 +48,7 @@ export default function Profile() {
       <Head>
         <title>Profile</title>
       </Head>
+      <NavBar/>
       <Container
         component='main'
         maxWidth='xs'
