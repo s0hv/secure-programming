@@ -6,7 +6,6 @@ specifiers:
   '@emotion/server': ^11.10.0
   '@emotion/styled': ^11.10.6
   '@mui/material': ^5.11.12
-  '@mui/system': ^5.11.12
   '@next/font': ^13.2.4
   '@types/node': 18.15.1
   '@types/react': 18.0.28
@@ -28,7 +27,6 @@ dependencies:
   '@emotion/server': 11.10.0
   '@emotion/styled': 11.10.6_oouaibmszuch5k64ms7uxp2aia
   '@mui/material': 5.11.12_xqeqsl5kvjjtyxwyi3jhw3yuli
-  '@mui/system': 5.11.12_d2lgyfpecxdc2bsiwyag5wf7ti
   '@next/font': 13.2.4
   '@types/node': 18.15.1
   '@types/react': 18.0.28
