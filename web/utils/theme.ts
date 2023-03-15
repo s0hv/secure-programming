@@ -1,7 +1,4 @@
-import {
-  createTheme,
-  responsiveFontSizes,
-} from '@mui/material/styles';
+import { createTheme, responsiveFontSizes, } from '@mui/material/styles';
 
 import { Roboto } from '@next/font/google';
 
@@ -15,7 +12,7 @@ export const roboto = Roboto({
 
 export const theme = responsiveFontSizes(createTheme({
   palette: {
-    mode: 'dark'
+    mode: 'dark',
   },
   breakpoints: {
     values: {

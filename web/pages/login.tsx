@@ -1,29 +1,38 @@
 import Head from 'next/head';
-import { Box, Button, Container, Link, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Link,
+  TextField,
+  Typography
+} from '@mui/material';
 import { FC } from 'react';
 import { NavBar } from '@/components/NavBar';
 
 const LoginForm: FC = () => {
-  return <>
-    <Typography
-      variant='h4'
-      sx={{ mb: 2 }}
-    >
-                  Log in
-    </Typography>
-    <TextField
-      name='username'
-      label='Username'
-      sx={{ mb: 1 }}
-    />
-    <TextField
-      name='password'
-      type='password'
-      label='Password'
-      sx={{ mb: 1 }}
-    />
-    <Button variant='contained'>Log in</Button>
-  </>;
+  return (
+    <>
+      <Typography
+        variant='h4'
+        sx={{ mb: 2 }}
+      >
+        Log in
+      </Typography>
+      <TextField
+        name='username'
+        label='Username'
+        sx={{ mb: 1 }}
+      />
+      <TextField
+        name='password'
+        type='password'
+        label='Password'
+        sx={{ mb: 1 }}
+      />
+      <Button variant='contained'>Log in</Button>
+    </>
+  );
 };
 
 export default function Login() {
@@ -32,7 +41,7 @@ export default function Login() {
       <Head>
         <title>Log into App</title>
       </Head>
-      <NavBar/>
+      <NavBar />
       <Container
         component='main'
         maxWidth='xs'
@@ -43,18 +52,20 @@ export default function Login() {
           flexDirection='column'
           component='form'
           sx={{
-            mb: 2
+            mb: 2,
           }}
         >
-          <LoginForm/>
+          <LoginForm />
         </Box>
         <Box flexDirection='row' component='form'>
           <Link
-            href='#'
+            href='#.'
             sx={{
-              mr: 2
+              mr: 2,
             }}
-          >Forgot password?</Link>
+          >
+            Forgot password?
+          </Link>
           <Link href='/signup'>Sign up instead</Link>
         </Box>
       </Container>

@@ -4,7 +4,7 @@ import { FC } from 'react';
 import { Button, Container, Skeleton, Stack, Typography } from '@mui/material';
 
 const Posts: FC = () => {
-  return <>
+  return (
     <Stack
       direction='column'
       justifyContent='space-evenly'
@@ -42,7 +42,7 @@ const Posts: FC = () => {
         animation={false}
       />
     </Stack>
-  </>;
+  );
 };
 
 export default function Home() {
@@ -51,28 +51,30 @@ export default function Home() {
       <Head>
         <title>App</title>
       </Head>
-      <NavBar/>
+      <NavBar />
       <Container
         component='main'
         maxWidth='xs'
         sx={{
           textAlign: 'center',
-          mb: 5
+          mb: 5,
         }}
       >
         <Typography
           variant='h5'
           sx={{ mb: 1 }}
         >
-                  Latest posts
+          Latest posts
         </Typography>
-        <Posts/>
+        <Posts />
       </Container>
       <Button
         href='/'
         variant='contained'
-        sx={{ position: 'fixed', bottom: '05%', right: '25%', }}
-      >New post</Button>
+        sx={{ position: 'fixed', bottom: '05%', right: '25%' }}
+      >
+        New post
+      </Button>
     </>
   );
 }

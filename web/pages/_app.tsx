@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { type FC, type  PropsWithChildren, useMemo } from 'react';
+import { type FC, type PropsWithChildren, useMemo } from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
@@ -7,13 +7,18 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/utils/theme';
-import { type FrontendUser, type UserContextValue, UserProvider } from '@/utils/useUser';
+import {
+  type FrontendUser,
+  type UserContextValue,
+  UserProvider
+} from '@/utils/useUser';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import { handleResponse } from '@/api/utilities';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -22,8 +27,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-    }
-  }
+    },
+  },
 });
 
 export interface MyAppProps extends AppProps {
@@ -37,13 +42,13 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
       method: 'POST',
       credentials: 'include',
     })
-      .then(res => res.json() as Promise<FrontendUser>)
+      .then(handleResponse<FrontendUser>),
   });
 
   const providerValue = useMemo<UserContextValue>(() => ({
     user,
-    isFetching
-  }),  [user, isFetching]);
+    isFetching,
+  }), [user, isFetching]);
 
   return (
     <UserProvider value={providerValue}>

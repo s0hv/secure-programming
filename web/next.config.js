@@ -12,6 +12,6 @@ const nextConfig = {
       transform: '@mui/icons-material/{{member}}',
     },
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

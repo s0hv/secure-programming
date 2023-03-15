@@ -26,6 +26,6 @@ export const useUser: UseUser = () => {
     user,
     isAuthenticated: !!user,
     isAdmin: !!user?.admin,
-    isFetching
+    isFetching,
   }), [user, isFetching]);
 };

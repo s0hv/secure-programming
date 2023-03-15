@@ -1,44 +1,55 @@
 import Head from 'next/head';
-import { Box, Button, Container, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { FC } from 'react';
 import { NavBar } from '@/components/NavBar';
 
 
 const PasswordChange: FC = () => {
-  return <>
-    <Typography
-      variant='h5'
-      sx={{ mb: 1 }}
-    >
+  return (
+    <>
+      <Typography
+        variant='h5'
+        sx={{ mb: 1 }}
+      >
         Change Password
-    </Typography>
-    <TextField
-      name='old'
-      label='Old password'
-      type='password'
-      sx={{ mb: 1 }}
-    />
-    <TextField
-      name='new'
-      label='New password'
-      type='password'
-      sx={{ mb: 1 }}
-    />
-    <TextField
-      name='repeat'
-      label='Repeat new password'
-      type='password'
-      sx={{ mb: 1 }}
-    />
-    <Button variant='outlined'>Change password</Button>
-  </>;
+      </Typography>
+      <TextField
+        name='old'
+        label='Old password'
+        type='password'
+        sx={{ mb: 1 }}
+      />
+      <TextField
+        name='new'
+        label='New password'
+        type='password'
+        sx={{ mb: 1 }}
+      />
+      <TextField
+        name='repeat'
+        label='Repeat new password'
+        type='password'
+        sx={{ mb: 1 }}
+      />
+      <Button variant='outlined'>Change password</Button>
+    </>
+  );
 };
 
 const AccountDeletion: FC = () => {
-  return <>
-    <Button variant='outlined' color='error'>Delete Account</Button>
-    <Typography variant='body1'>Warning! Deleting your account is permanent.</Typography>
-  </>;
+  return (
+    <>
+      <Button variant='outlined' color='error'>Delete Account</Button>
+      <Typography variant='body1'>Warning! Deleting your account is permanent.</Typography>
+    </>
+  );
 };
 
 export default function Profile() {
@@ -47,7 +58,7 @@ export default function Profile() {
       <Head>
         <title>Profile</title>
       </Head>
-      <NavBar/>
+      <NavBar />
       <Container
         component='main'
         maxWidth='xs'
@@ -59,10 +70,10 @@ export default function Profile() {
             flexDirection='column'
             component='form'
           >
-            <PasswordChange/>
+            <PasswordChange />
           </Box>
           <Box flexDirection='column'>
-            <AccountDeletion/>
+            <AccountDeletion />
           </Box>
         </Stack>
       </Container>

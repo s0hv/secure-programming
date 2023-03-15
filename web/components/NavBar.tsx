@@ -3,13 +3,13 @@ import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useUser } from '@/utils/useUser';
 
 
-const NavBar: FC = () => {
+export const NavBar: FC = () => {
   const { isAuthenticated } = useUser();
 
   return (
     <Box sx={{
       flexGrow: 1,
-      mb: 4
+      mb: 4,
     }}
     >
       <AppBar position='fixed'>
@@ -34,9 +34,8 @@ const NavBar: FC = () => {
           )}
         </Toolbar>
       </AppBar>
-      <Toolbar/>
+      <Toolbar />
     </Box>
   );
 };
 
-export { NavBar };
