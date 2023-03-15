@@ -70,6 +70,7 @@ export default function Home() {
       </Container>
       <Button
         href='/'
+        variant='contained'
         sx={{ position: 'fixed', bottom: '05%', right: '25%', }}
       >New post</Button>
     </>

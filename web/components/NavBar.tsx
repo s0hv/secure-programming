@@ -1,8 +1,11 @@
 import { FC } from 'react';
-import { AppBar, Toolbar, Box, Button, Typography } from '@mui/material';
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { useUser } from '@/utils/useUser';
 
 
 const NavBar: FC = () => {
+  const { isAuthenticated } = useUser();
+
   return (
     <Box sx={{
       flexGrow: 1,
@@ -18,10 +21,17 @@ const NavBar: FC = () => {
           >
             App name or logo here
           </Typography>
-          <Button color='inherit' href='/login'>Login</Button>
-          <Button color='inherit' href='/signup'>Sign up</Button>
-          <Button color='inherit' href='/profile'>Profile</Button>
-          <Button color='inherit' href='/'>Logout</Button>
+          { isAuthenticated ? (
+            <>
+              <Button color='inherit' href='/profile'>Profile</Button>
+              <Button color='inherit' href='/'>Logout</Button>
+            </>
+          ) : (
+            <>
+              <Button color='inherit' href='/login'>Login</Button>
+              <Button color='inherit' href='/signup'>Sign up</Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       <Toolbar/>

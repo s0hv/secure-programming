@@ -68,8 +68,9 @@ async fn main() -> std::io::Result<()> {
 
         #[cfg(debug_assertions)]
         let cors = Cors::default()
-              .allowed_origin("http://localhost:3000")
-              .max_age(3600);
+            .allowed_origin("http://localhost:3000")
+            .supports_credentials()
+            .max_age(3600);
 
         #[cfg(not(debug_assertions))]
         let cors = Cors::default();
