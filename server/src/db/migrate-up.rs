@@ -1,13 +1,18 @@
-use tokio_postgres::{NoTls};
+use dotenv::dotenv;
+use tokio_postgres::NoTls;
+
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 mod embedded {
     use refinery::embed_migrations;
+
     embed_migrations!("migrations");
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    dotenv().ok();
+
     let config = std::env::var("POSTGRES_CONFIG");
     let config_string = match config {
         Ok(config_string) => config_string,

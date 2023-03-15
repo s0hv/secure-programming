@@ -1,16 +1,16 @@
+use actix_cors::Cors;
 use actix_session::{Session, SessionMiddleware};
 use actix_session::config::PersistentSession;
-use actix_cors::Cors;
-use actix_web::{App, dev, get, HttpResponse, HttpServer, post, Responder, Result, web};
+use actix_web::{App, get, HttpResponse, HttpServer, post, Responder, Result, web};
 use actix_web::cookie::Key;
-use actix_web::http::header;
-use actix_web::middleware::{ErrorHandlerResponse, ErrorHandlers, Logger};
+use actix_web::middleware::Logger;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
+use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
-use crate::db::session_store::PostgresSessionStore;
-use crate::models::AppState;
 use crate::api::user::authenticate;
+use crate::db::session_store::{clear_old_sessions, PostgresSessionStore};
+use crate::models::AppState;
 
 mod db;
 mod models;
@@ -32,17 +32,12 @@ async fn echo(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
-fn add_error_header<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerResponse<B>> {
-    res.response_mut().headers_mut().insert(
-        header::CONTENT_TYPE,
-        header::HeaderValue::from_static("Error"),
-    );
-    Ok(ErrorHandlerResponse::Response(res.map_into_left_body()))
-}
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+    env_logger::init();
+
     let config = std::env::var("POSTGRES_CONFIG");
     let config_string = match config {
         Ok(config_string) => config_string,
@@ -58,7 +53,7 @@ async fn main() -> std::io::Result<()> {
     let mgr_config = ManagerConfig {
         recycling_method: RecyclingMethod::Fast
     };
-    let mgr = Manager::from_config(config, NoTls, mgr_config);
+    let mgr = Manager::from_config(config.clone(), NoTls, mgr_config);
     let pool = Pool::builder(mgr).max_size(16).build().unwrap();
 
     // Try connecting to db
@@ -66,19 +61,24 @@ async fn main() -> std::io::Result<()> {
         .await
         .map_err(|_| std::io::Error::new(std::io::ErrorKind::NotConnected, "Failed to connect to postgres"))?;
 
+    let (handle, cance_token) = clear_old_sessions(config);
+
     HttpServer::new(move || {
         let secret_key = Key::generate();
+
+        #[cfg(debug_assertions)]
         let cors = Cors::default()
               .allowed_origin("http://localhost:3000")
               .max_age(3600);
+
+        #[cfg(not(debug_assertions))]
+        let cors = Cors::default();
 
         App::new()
             .app_data(AppState {
                 pool: pool.clone()
             })
             .wrap(cors)
-            .wrap(ErrorHandlers::new()
-                .default_handler(add_error_header))
             .wrap(Logger::default())
             .wrap(SessionMiddleware::builder(
                 PostgresSessionStore::new(pool.clone()),
@@ -87,6 +87,7 @@ async fn main() -> std::io::Result<()> {
                 .session_lifecycle(PersistentSession::default())
                 .build()
             )
+
             .service(hello)
             .service(echo)
             .service(
@@ -96,5 +97,10 @@ async fn main() -> std::io::Result<()> {
     })
     .bind(("127.0.0.1", 8080))?
     .run()
-    .await
+    .await?;
+
+    cance_token.cancel();
+    let _ = handle.await.unwrap();
+
+    Ok(())
 }

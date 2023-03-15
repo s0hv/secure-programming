@@ -1,10 +1,48 @@
 use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
-use actix_session::{storage::SessionStore};
+
+use actix_session::storage::SessionStore;
 use actix_session::storage::{LoadError, SaveError, SessionKey, UpdateError};
 use actix_web::cookie::time::Duration;
-use deadpool_postgres::{Pool};
-use rand::{distributions::Alphanumeric, rngs::OsRng, Rng as _};
+use deadpool_postgres::{Manager, ManagerConfig, Pool, PoolError, RecyclingMethod};
+use rand::{distributions::Alphanumeric, Rng as _, rngs::OsRng};
+use serde::{Deserialize, Serialize};
+use tokio_postgres::{Config, NoTls};
+use tokio_util::sync::CancellationToken;
+
+pub fn clear_old_sessions(config: Config) -> (tokio::task::JoinHandle<Result<(), PoolError>>, CancellationToken) {
+    let cancel_token = CancellationToken::new();
+
+    (
+        tokio::spawn(session_clear_job(config, cancel_token.clone())),
+        cancel_token
+    )
+}
+
+async fn session_clear_job(config: Config, cancel_token: CancellationToken) -> Result<(), PoolError> {
+    let mgr_config = ManagerConfig {
+        recycling_method: RecyclingMethod::Fast
+    };
+    let mgr = Manager::from_config(config, NoTls, mgr_config);
+    let pool = Pool::builder(mgr).max_size(1).build().unwrap();
+
+    loop {
+        let client = pool.get().await?;
+        // language=sql
+        client.execute("DELETE FROM sessions WHERE expires_at < CURRENT_TIMESTAMP", &[]).await?;
+
+        tokio::select! {
+            _ = tokio::time::sleep(std::time::Duration::from_secs(60 * 60 * 2)) => {
+                continue;
+            }
+
+            _ = cancel_token.cancelled() => {
+                break;
+            }
+        }
+    }
+
+    Ok(())
+}
 
 
 pub struct PostgresSessionStore {
