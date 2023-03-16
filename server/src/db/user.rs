@@ -1,4 +1,5 @@
 use deadpool_postgres::Client;
+use log::debug;
 use uuid::Uuid;
 
 use crate::db::errors::DbError;
@@ -8,7 +9,10 @@ pub async fn get_user(client: &Client, user_id: Uuid) -> Result<Option<User>, Db
     // language=postgresql
     let row = client.query_opt("SELECT user_id, username, email, admin FROM users WHERE user_id=$1", &[&user_id])
         .await
-        .map_err(|_| DbError::InternalError)?;
+        .map_err(|err| {
+            debug!("Error while gettimg user. {}", err);
+            DbError::InternalError
+        })?;
 
     match row {
         Some(row) => Ok(Some(User::from(&row))),
@@ -20,7 +24,10 @@ pub async fn authenticate(client: &Client, email: &String, password: &String) ->
     // language=postgresql
     let row = client.query_opt("SELECT user_id, username, email, admin FROM users WHERE email=$1 AND pwhash=crypt($2, pwhash)", &[email, password])
         .await
-        .map_err(|_| DbError::InternalError)?;
+        .map_err(|err| {
+            debug!("Error while authenticating user. {}", err);
+            DbError::InternalError
+        })?;
 
     match row {
         Some(row) => Ok(Some(User::from(&row))),

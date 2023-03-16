@@ -1,7 +1,7 @@
 use actix_cors::Cors;
-use actix_session::{Session, SessionMiddleware};
+use actix_session::SessionMiddleware;
 use actix_session::config::PersistentSession;
-use actix_web::{App, get, HttpResponse, HttpServer, post, Responder, Result, web};
+use actix_web::{App, HttpServer, web};
 use actix_web::cookie::Key;
 use actix_web::middleware::Logger;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
@@ -15,23 +15,6 @@ use crate::models::AppState;
 mod db;
 mod models;
 mod api;
-
-#[get("/")]
-async fn hello(session: Session) -> Result<impl Responder> {
-    if let Some(csrf) = session.get::<String>("csrf")? {
-        println!("session found: {}", csrf);
-    } else {
-        session.insert("csrf", "test")?;
-    }
-
-    Ok(HttpResponse::Ok().body("Hello world!"))
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -94,8 +77,7 @@ async fn main() -> std::io::Result<()> {
             )
 
             .service(web::scope("/api/auth").configure(api::auth::config))
-            .service(hello)
-            .service(echo)
+            .service(web::scope("/api/posts").configure(api::posts::config))
             .service(
                 web::scope("/api/user")
                     .service(authenticate)

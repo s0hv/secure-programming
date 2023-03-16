@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use actix_session::storage::{LoadError, SaveError, SessionKey, UpdateError};
 use actix_session::storage::SessionStore;
 use actix_web::cookie::time::Duration;
-use deadpool_postgres::{Manager, ManagerConfig, Pool, PoolError, RecyclingMethod};
+use deadpool_postgres::{Client, Manager, ManagerConfig, Pool, PoolError, RecyclingMethod};
+use log::debug;
 use rand::{distributions::Alphanumeric, Rng as _, rngs::OsRng};
 use serde::{Deserialize, Serialize};
 use tokio_postgres::{Config, NoTls};
@@ -75,21 +76,39 @@ impl PostgresSessionStore {
             pool
         }
     }
+
+    pub async fn get_client(&self) -> Result<Client, anyhow::Error> {
+        self.pool.get()
+            .await
+            .map_err(|err| {
+                debug!("Failed to get connection. {}", err);
+                err
+            })
+            .map_err(anyhow::Error::new)
+    }
 }
 
 #[async_trait::async_trait(?Send)]
 impl SessionStore for PostgresSessionStore {
     async fn load(&self, session_key: &SessionKey) -> Result<Option<SessionState>, LoadError> {
-        let client = self.pool.get()
+        let client = self.get_client()
             .await
-            .map_err(anyhow::Error::new)
             .map_err(LoadError::Other)?;
 
         let session_id = session_key.as_ref();
 
-        // language=sql
-        let row = client.query_opt("SELECT data FROM sessions WHERE expires_at > CURRENT_TIMESTAMP AND session_id=$1", &[&session_id.to_string()])
+        let row = client.query_opt(
+            // language=postgresql
+            "
+            SELECT data
+            FROM sessions
+            WHERE expires_at > CURRENT_TIMESTAMP AND session_id=$1", &[&session_id.to_string()]
+        )
             .await
+            .map_err(|err| {
+                debug!("Failed to load session. {}", err);
+                err
+            })
             .map_err(anyhow::Error::new)
             .map_err(LoadError::Deserialization);
 
@@ -102,17 +121,25 @@ impl SessionStore for PostgresSessionStore {
         };
 
         serde_json::from_str(&data)
+            .map_err(|err| {
+                debug!("Failed to serialize session data after load. {}", err);
+                err
+            })
             .map_err(Into::into)
             .map_err(LoadError::Deserialization)
     }
 
     async fn save(&self, session_state: SessionState, ttl: &Duration) -> Result<SessionKey, SaveError> {
         let session_key = generate_session_key();
-        let client = self.pool.get().await
-            .map_err(anyhow::Error::new)
+        let client = self.get_client()
+            .await
             .map_err(SaveError::Other)?;
 
         let data = serde_json::to_string(&session_state)
+            .map_err(|err| {
+                debug!("Failed to serialize session. {}", err);
+                err
+            })
             .map_err(Into::into)
             .map_err(SaveError::Serialization)?;
 
@@ -121,6 +148,10 @@ impl SessionStore for PostgresSessionStore {
             .map(|v| serde_json::from_str::<String>(v).unwrap())
             .map(|v|
                 Uuid::parse_str(v.as_str())
+                    .map_err(|err| {
+                        debug!("Failed to parse session user id as uuid. {}", err);
+                        err
+                    })
                     .map_err(anyhow::Error::new)
                     .map_err(SaveError::Serialization))
         {
@@ -130,9 +161,15 @@ impl SessionStore for PostgresSessionStore {
 
         match client.execute(
             // language=sql
-            "INSERT INTO sessions (session_id, expires_at, data, user_id) VALUES ($1, CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second', $3, $4)"
+            "
+            INSERT INTO sessions (session_id, expires_at, data, user_id)
+            VALUES ($1, CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second', $3, $4)"
         , &[&session_key.as_ref().to_string(), &ttl.whole_seconds(), &data, &user_id])
             .await
+            .map_err(|err| {
+                debug!("Failed to save session. {}", err);
+                err
+            })
             .map_err(anyhow::Error::new)
             .map_err(SaveError::Other)
         {
@@ -142,20 +179,31 @@ impl SessionStore for PostgresSessionStore {
     }
 
     async fn update(&self, session_key: SessionKey, session_state: SessionState, ttl: &Duration) -> Result<SessionKey, UpdateError> {
-        let client = self.pool.get().await
-            .map_err(anyhow::Error::new)
+        let client = self.get_client()
+            .await
             .map_err(UpdateError::Other)?;
 
         let data = serde_json::to_string(&session_state)
+            .map_err(|err| {
+                debug!("Failed to serialize data in update session. {}", err);
+                err
+            })
             .map_err(Into::into)
             .map_err(UpdateError::Serialization)?;
 
         let updated = client.execute(
             // language=sql
-            "UPDATE sessions SET data=$1, expires_at=CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second' WHERE session_id=$3",
+            "
+            UPDATE sessions
+            SET data=$1, expires_at=CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second'
+            WHERE session_id=$3",
             &[&data, &ttl.whole_seconds(), &session_key.as_ref().to_string()]
         )
             .await
+            .map_err(|err| {
+                debug!("Failed to update session to db. {}", err);
+                err
+            })
             .map_err(anyhow::Error::new)
             .map_err(UpdateError::Other);
 
@@ -175,15 +223,21 @@ impl SessionStore for PostgresSessionStore {
     }
 
     async fn update_ttl(&self, session_key: &SessionKey, ttl: &Duration) -> Result<(), anyhow::Error> {
-        let client = self.pool.get().await
-            .map_err(anyhow::Error::new)?;
+        let client = self.get_client().await?;
 
         match client.execute(
             // language=sql
-            "UPDATE sessions SET expires_at=CURRENT_TIMESTAMP + $1::BIGINT * INTERVAL '1 second' WHERE session_id=$2",
+            "
+            UPDATE sessions
+            SET expires_at=CURRENT_TIMESTAMP + $1::BIGINT * INTERVAL '1 second'
+            WHERE session_id=$2",
             &[&ttl.whole_seconds(), &session_key.as_ref().to_string()]
         )
             .await
+            .map_err(|err| {
+                debug!("Failed to update session ttl. {}", err);
+                err
+            })
             .map_err(anyhow::Error::new)
         {
             Ok(_) => Ok(()),
@@ -192,8 +246,7 @@ impl SessionStore for PostgresSessionStore {
     }
 
     async fn delete(&self, session_key: &SessionKey) -> Result<(), anyhow::Error> {
-        let client = self.pool.get().await
-            .map_err(anyhow::Error::new)?;
+        let client = self.get_client().await?;
 
         match client.execute(
             // language=sql
@@ -201,6 +254,10 @@ impl SessionStore for PostgresSessionStore {
             &[&session_key.as_ref().to_string()]
         )
             .await
+            .map_err(|err| {
+                debug!("Failed to delete session. {}", err);
+                err
+            })
             .map_err(anyhow::Error::new)
         {
             Ok(_) => Ok(()),
