@@ -21,6 +21,7 @@ specifiers:
   eslint-plugin-jsx-a11y: ^6.7.1
   eslint-plugin-react: ^7.32.2
   eslint-plugin-react-hooks: ^4.6.0
+  material-ui-confirm: ^3.0.9
   next: 13.2.4
   react: 18.2.0
   react-dom: 18.2.0
@@ -47,6 +48,7 @@ dependencies:
   eslint-plugin-jsx-a11y: 6.7.1_eslint@8.36.0
   eslint-plugin-react: 7.32.2_eslint@8.36.0
   eslint-plugin-react-hooks: 4.6.0_eslint@8.36.0
+  material-ui-confirm: 3.0.9_k6epeoptwl5xiv2c76rtmxgsvm
   next: 13.2.4_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -2302,6 +2304,18 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: false
+
+  /material-ui-confirm/3.0.9_k6epeoptwl5xiv2c76rtmxgsvm:
+    resolution: {integrity: sha512-WEAEG9z4MfwojoUyQiAjrjl8378tYbGKfiwOKz3zHaQKyXcHnFktUmV7b+F+G0yVo8kYrEMk9Bw+HxhA/2Enlw==}
+    peerDependencies:
+      '@mui/material': '>= 5.0.0'
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+    dependencies:
+      '@mui/material': 5.11.12_xqeqsl5kvjjtyxwyi3jhw3yuli
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /merge2/1.4.1:
