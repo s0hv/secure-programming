@@ -1,10 +1,6 @@
 import { createContext, useContext, useMemo } from 'react';
+import { FrontendUser } from '@/types/api/user';
 
-export type FrontendUser = {
-  user_id: string,
-  username: string,
-  admin: boolean,
-}
 
 export type UserContextValue = {
   user?: FrontendUser

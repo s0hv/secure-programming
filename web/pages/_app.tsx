@@ -8,9 +8,8 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/utils/theme';
 import {
-  type FrontendUser,
   type UserContextValue,
-  UserProvider
+  UserProvider,
 } from '@/utils/useUser';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
@@ -18,7 +17,8 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
-import { handleResponse } from '@/api/utilities';
+import { handleResponse } from '@/types/api/utilities';
+import { FrontendUser } from '@/types/api/user';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
