@@ -10,18 +10,48 @@ import {
 } from '@mui/material';
 import { FC, FormEvent, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
+import { handleResponse } from '@/types/api/utilities';
+import type { FrontendUser } from '@/types/api/user';
+import { useUser } from '@/utils/useUser';
+import { useRouter } from 'next/router';
 
 const LoginForm: FC = () => {
   const PWRef = useRef<HTMLInputElement>();
   const [alert, setAlert] = useState(false);
-  const loginUser = (event: FormEvent) => {
+  const router = useRouter();
+  const { setUser } = useUser();
+
+  const loginUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log('Validate PW, authenticate, on success take to landing page,' +
       ' else clear password, give error message');
-    if (PWRef.current) {
-      PWRef.current.value = '';
-    }
-    setAlert(true);
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const body: Record<string, unknown> = {};
+    formData.forEach((val, key) => {
+      body[key] = val;
+    });
+
+    fetch('http://localhost:8080/api/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      redirect: 'manual',
+      body: JSON.stringify(body),
+    }).then(handleResponse<FrontendUser>)
+      .then(setUser)
+      .then(() => {
+        setAlert(false);
+        return router.push('/');
+      })
+      .catch(() => {
+        if (PWRef.current) {
+          PWRef.current.value = '';
+        }
+        setAlert(true);
+      });
   };
 
   return (
@@ -49,7 +79,7 @@ const LoginForm: FC = () => {
         </Alert>
       ) : null}
       <TextField
-        name='username'
+        name='email'
         label='Username'
         sx={{ mb: 2 }}
       />

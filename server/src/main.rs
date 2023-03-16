@@ -42,10 +42,19 @@ async fn main() -> std::io::Result<()> {
     let config_string = match config {
         Ok(config_string) => config_string,
         Err(_) => {
-            println!("POSTGRES_CONFIG environment variable must be defined");
+            eprintln!("POSTGRES_CONFIG environment variable must be defined");
             return Ok(())
         },
     };
+
+    let secret_key = match std::env::var("SESSION_SECRET") {
+        Ok(val) => Key::from(val.as_bytes()),
+        Err(_) => {
+            eprintln!("SESSION_SECRET environment variable must be defined");
+            return Ok(())
+        }
+    };
+
 
     let config = config_string.as_str().parse::<tokio_postgres::Config>()
         .map_err( |_| std::io::Error::new(std::io::ErrorKind::NotConnected, "Failed to connect to postgres"))?;
@@ -64,21 +73,16 @@ async fn main() -> std::io::Result<()> {
     let (handle, cance_token) = clear_old_sessions(config);
 
     HttpServer::new(move || {
-        let secret_key = Key::generate();
-
         #[cfg(debug_assertions)]
-        let cors = Cors::default()
-            .allowed_origin("http://localhost:3000")
-            .supports_credentials()
-            .max_age(3600);
+        let cors = Cors::permissive();
 
         #[cfg(not(debug_assertions))]
         let cors = Cors::default();
 
         App::new()
-            .app_data(AppState {
+            .app_data(web::Data::new(AppState {
                 pool: pool.clone()
-            })
+            }))
             .wrap(cors)
             .wrap(Logger::default())
             .wrap(SessionMiddleware::builder(
@@ -89,6 +93,7 @@ async fn main() -> std::io::Result<()> {
                 .build()
             )
 
+            .service(web::scope("/api/auth").configure(api::auth::config))
             .service(hello)
             .service(echo)
             .service(

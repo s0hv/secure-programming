@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
-use actix_session::storage::SessionStore;
 use actix_session::storage::{LoadError, SaveError, SessionKey, UpdateError};
+use actix_session::storage::SessionStore;
 use actix_web::cookie::time::Duration;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, PoolError, RecyclingMethod};
 use rand::{distributions::Alphanumeric, Rng as _, rngs::OsRng};
 use serde::{Deserialize, Serialize};
 use tokio_postgres::{Config, NoTls};
 use tokio_util::sync::CancellationToken;
+use uuid::Uuid;
 
 pub fn clear_old_sessions(config: Config) -> (tokio::task::JoinHandle<Result<(), PoolError>>, CancellationToken) {
     let cancel_token = CancellationToken::new();
@@ -111,19 +112,29 @@ impl SessionStore for PostgresSessionStore {
             .map_err(anyhow::Error::new)
             .map_err(SaveError::Other)?;
 
-
         let data = serde_json::to_string(&session_state)
             .map_err(Into::into)
             .map_err(SaveError::Serialization)?;
 
+        // The value is deserialized to json on insert
+        let user_id: Option<Uuid> = match session_state.get("user_id")
+            .map(|v| serde_json::from_str::<String>(v).unwrap())
+            .map(|v|
+                Uuid::parse_str(v.as_str())
+                    .map_err(anyhow::Error::new)
+                    .map_err(SaveError::Serialization))
+        {
+            Some(val) => Some(val?),
+            None => None
+        };
+
         match client.execute(
             // language=sql
-            "INSERT INTO sessions (session_id, expires_at, data) VALUES ($1, CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second', $3)"
-        , &[&session_key.as_ref().to_string(), &ttl.whole_seconds(), &data])
+            "INSERT INTO sessions (session_id, expires_at, data, user_id) VALUES ($1, CURRENT_TIMESTAMP + $2::BIGINT * INTERVAL '1 second', $3, $4)"
+        , &[&session_key.as_ref().to_string(), &ttl.whole_seconds(), &data, &user_id])
             .await
             .map_err(anyhow::Error::new)
             .map_err(SaveError::Other)
-
         {
             Ok(_) => Ok(session_key),
             Err(err) => Err(err)

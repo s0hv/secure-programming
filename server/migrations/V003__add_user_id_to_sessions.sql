@@ -1,0 +1,1 @@
+ALTER TABLE sessions ADD COLUMN user_id uuid REFERENCES users(user_id) ON DELETE CASCADE DEFAULT NULL;

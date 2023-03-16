@@ -1,18 +1,31 @@
-use actix_web::{post, Responder, Result, web};
+use actix_session::Session;
+use actix_web::{error, HttpResponse, post, Result, web};
+use serde::Serialize;
+use uuid::Uuid;
 
+use crate::api::errors::ApiError;
+use crate::db::models::User;
+use crate::db::user::get_user;
+use crate::models::AppState;
 
-use db::models::User;
-use crate::db;
+#[derive(Serialize)]
+struct UserResponse {
+    user: Option<User>
+}
 
 #[post("/authenticate")]
-pub async fn authenticate() -> Result<impl Responder> {
-    let user = User {
-        user_id: "82737e6a-b6fe-459c-af56-9fc4f293c515".to_string(),
-        username: "Test user".to_string(),
-        email: "test@email.com".to_string(),
-        admin: false,
-    };
+pub async fn authenticate(session: Session, data: web::Data<AppState>) -> Result<HttpResponse, error::Error> {
+    if let Some(user_id) = session.get::<Uuid>("user_id")? {
+        let user = get_user(&data.get_client().await?, user_id).await?;
+        if user.is_none() {
+            return Err(error::Error::from(ApiError::Unauthorized))
+        }
 
-    println!("test");
-    Ok(web::Json(user))
+        Ok(HttpResponse::Ok().json(UserResponse { user }))
+    } else {
+        Ok(
+            HttpResponse::Ok()
+                .json(UserResponse { user: None })
+        )
+    }
 }

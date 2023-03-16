@@ -7,10 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { theme } from '@/utils/theme';
-import {
-  type UserContextValue,
-  UserProvider,
-} from '@/utils/useUser';
+import { type UserContextValue, UserProvider, } from '@/utils/useUser';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   QueryClient,
@@ -19,6 +16,7 @@ import {
 } from '@tanstack/react-query';
 import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
+import { QueryKeys } from '@/utils/constants';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -36,13 +34,14 @@ export interface MyAppProps extends AppProps {
 }
 
 const Root: FC<PropsWithChildren> = ({ children }) => {
-  const { data: user, isFetching } = useQuery({
-    queryKey: ['user'],
+  const { data: user, isFetching } = useQuery<FrontendUser | undefined>({
+    queryKey: QueryKeys.user,
     queryFn: () => fetch('http://localhost:8080/api/user/authenticate', {
       method: 'POST',
       credentials: 'include',
     })
-      .then(handleResponse<FrontendUser>),
+      .then(handleResponse<{ user: FrontendUser | null}>)
+      .then(data => data.user || undefined),
   });
 
   const providerValue = useMemo<UserContextValue>(() => ({

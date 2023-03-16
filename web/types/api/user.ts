@@ -1,5 +1,5 @@
 export type FrontendUser = {
-  user_id: string,
+  userId: string,
   username: string,
   admin: boolean,
 }

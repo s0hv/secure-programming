@@ -1,5 +1,7 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 import { FrontendUser } from '@/types/api/user';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '@/utils/constants';
 
 
 export type UserContextValue = {
@@ -10,6 +12,7 @@ export type UserContextValue = {
 export type UseUser = () => UserContextValue & {
   isAuthenticated: boolean
   isAdmin: boolean
+  setUser: (user: FrontendUser | undefined) => void
 }
 
 const UserContext = createContext<UserContextValue>({ isFetching: false });
@@ -17,11 +20,17 @@ export const UserProvider = UserContext.Provider;
 
 export const useUser: UseUser = () => {
   const { user, isFetching } = useContext(UserContext);
+  const client = useQueryClient();
+
+  const setUser = useCallback((newUser: FrontendUser | undefined) => {
+    client.setQueryData(QueryKeys.user, newUser);
+  }, [client]);
 
   return useMemo(() => ({
     user,
     isAuthenticated: !!user,
     isAdmin: !!user?.admin,
     isFetching,
-  }), [user, isFetching]);
+    setUser,
+  }), [user, isFetching, setUser]);
 };
