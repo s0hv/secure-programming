@@ -2,8 +2,11 @@ import Head from 'next/head';
 import { NavBar } from '@/components/NavBar';
 import { FC } from 'react';
 import { Button, Container, Skeleton, Stack, Typography } from '@mui/material';
+import { Post } from '@/components/Post';
+import { type Post as PostProps } from '@/types/api/post';
 
 const Posts: FC = () => {
+  const x: PostProps = { userId: 'e2ff2afa', timestamp: '10:23', text: 'Lorem ipsum' };
   return (
     <Stack
       direction='column'
@@ -11,6 +14,12 @@ const Posts: FC = () => {
       alignItems='center'
       spacing={4}
     >
+      <Post {...x} />
+      <Post
+        userId='ddddd'
+        timestamp='9:33'
+        text='aaaaaaaaaaaaaaaaaaaaa'
+      />
       <Skeleton
         variant='rectangular'
         width={510}
@@ -56,7 +65,6 @@ export default function Home() {
         component='main'
         maxWidth='xs'
         sx={{
-          textAlign: 'center',
           mb: 5,
         }}
       >
