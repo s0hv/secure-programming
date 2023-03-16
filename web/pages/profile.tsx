@@ -5,15 +5,33 @@ import {
   Container,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
-import { FC } from 'react';
+import { FC, FormEvent, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
+import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
+import { useUser } from '@/utils/useUser';
 
 
 const PasswordChange: FC = () => {
+  const [repeatValid, setRepeatValid] = useState(true);
+  const newPWRef = useRef<HTMLInputElement>();
+  const repeatPWRef = useRef<HTMLInputElement>();
+  const changePassword = (event: FormEvent) => {
+    event.preventDefault();
+    console.log('Validate old and new PW on backend and change');
+  };
+
+  const validateRepeatPassword = () => {
+    setRepeatValid(!repeatPWRef.current?.value || newPWRef.current?.value === repeatPWRef.current?.value);
+  };
   return (
-    <>
+    <Box
+      display='flex'
+      flexDirection='column'
+      component='form'
+      onSubmit={changePassword}
+    >
       <Typography
         variant='h5'
         sx={{ mb: 1 }}
@@ -30,23 +48,51 @@ const PasswordChange: FC = () => {
         name='new'
         label='New password'
         type='password'
+        inputRef={newPWRef}
+        onBlur={validateRepeatPassword}
         sx={{ mb: 1 }}
       />
       <TextField
         name='repeat'
         label='Repeat new password'
         type='password'
+        helperText={!repeatValid && 'Passwords do not match'}
+        error={!repeatValid}
+        inputRef={repeatPWRef}
+        onBlur={validateRepeatPassword}
         sx={{ mb: 1 }}
       />
-      <Button variant='outlined'>Change password</Button>
-    </>
+      <Button variant='outlined' type='submit'>Change password</Button>
+    </Box>
   );
 };
 
 const AccountDeletion: FC = () => {
+  const confirm = useConfirm();
+  const { user } = useUser();
+  const confirmationkw = `delete ${user}`;
+  const confirmDelete = () => {
+    confirm({
+      description: `To permanently delete the account, type "${confirmationkw}" and click Delete`,
+      confirmationKeyword: confirmationkw,
+      confirmationText: 'Delete',
+    })
+      .then(() => {
+        console.log('Handle delete on backend, then go to landing page');
+      }).catch(() => {
+        /* ... */
+      });
+  };
+
   return (
     <>
-      <Button variant='outlined' color='error'>Delete Account</Button>
+      <Button
+        variant='outlined'
+        color='error'
+        onClick={confirmDelete}
+      >
+        Delete Account
+      </Button>
       <Typography variant='body1'>Warning! Deleting your account is permanent.</Typography>
     </>
   );
@@ -54,7 +100,7 @@ const AccountDeletion: FC = () => {
 
 export default function Profile() {
   return (
-    <>
+    <ConfirmProvider>
       <Head>
         <title>Profile</title>
       </Head>
@@ -65,18 +111,12 @@ export default function Profile() {
         sx={{ textAlign: 'center' }}
       >
         <Stack spacing={20}>
-          <Box
-            display='flex'
-            flexDirection='column'
-            component='form'
-          >
-            <PasswordChange />
-          </Box>
+          <PasswordChange />
           <Box flexDirection='column'>
             <AccountDeletion />
           </Box>
         </Stack>
       </Container>
-    </>
+    </ConfirmProvider>
   );
 }
