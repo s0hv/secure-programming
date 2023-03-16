@@ -5,7 +5,7 @@ import {
   Container,
   Link,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import { FC } from 'react';
 import { NavBar } from '@/components/NavBar';
