@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Link, Toolbar, Typography } from '@mui/material';
 import { useUser } from '@/utils/useUser';
 
 
@@ -16,7 +16,10 @@ export const NavBar: FC = () => {
         <Toolbar>
           <Typography
             variant='h6'
-            component='div'
+            component={Link}
+            href='/'
+            color='inherit'
+            underline='none'
             sx={{ flexGrow: 1 }}
           >
             App name or logo here
