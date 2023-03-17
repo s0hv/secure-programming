@@ -40,7 +40,7 @@ const LoginForm: FC = () => {
       },
       redirect: 'manual',
       body: JSON.stringify(body),
-    }).then(handleResponse<FrontendUser>)
+    }).then(handleResponse<FrontendUser>())
       .then(setUser)
       .then(() => {
         setAlert(false);
