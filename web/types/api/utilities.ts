@@ -43,7 +43,7 @@ export const getResponseData = async <T = unknown>(json: any, dataKey: string | 
 };
 
 type HandleResponse = {
-  <T = unknown>(res: Response): Promise<T>
+  <T = unknown>(res: Response, dataKey?: string | null): Promise<T>
   (res: Response): Promise<void>
 }
 
