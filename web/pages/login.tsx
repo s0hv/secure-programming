@@ -80,7 +80,7 @@ const LoginForm: FC = () => {
       ) : null}
       <TextField
         name='email'
-        label='Username'
+        label='Email'
         sx={{ mb: 2 }}
       />
       <TextField
