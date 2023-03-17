@@ -5,7 +5,7 @@ import { QueryKeys } from '@/utils/constants';
 
 
 export type UserContextValue = {
-  user?: FrontendUser
+  user?: FrontendUser | null
   isFetching: boolean
 }
 

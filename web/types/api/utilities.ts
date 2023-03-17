@@ -43,18 +43,17 @@ export const getResponseData = async <T = unknown>(json: any, dataKey: string | 
 };
 
 type HandleResponse = {
-  <T = unknown>(res: Response, dataKey?: string | null): Promise<T>
-  (res: Response): Promise<void>
+  <T = unknown>(dataKey?: string | null): (res: Response) => Promise<T>
+  (): (res: Response) => Promise<void>
 }
 
 /**
  * Handles checking if request was successful and if it was returns the json body
- * @param {Response} res
  * @param {string|null} dataKey The key which the data is stored in. If null returns the whole json response.
  * @returns {Promise<any>} json body of the request
  * @throws {APIException} exception thrown if non-ok status code
  */
-export const handleResponse: HandleResponse = async <T = unknown>(res: Response, dataKey: string | null = 'data'): Promise<T | void> => {
+export const handleResponse: HandleResponse = <T = unknown>(dataKey: string | null = null) => async (res: Response): Promise<T | void> => {
   const contentType = res.headers.get('content-type') || '';
   const isJson = /application\/json/i.test(contentType);
 

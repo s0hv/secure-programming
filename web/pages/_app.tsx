@@ -34,14 +34,13 @@ export interface MyAppProps extends AppProps {
 }
 
 const Root: FC<PropsWithChildren> = ({ children }) => {
-  const { data: user, isFetching } = useQuery<FrontendUser | undefined>({
+  const { data: user, isFetching } = useQuery<FrontendUser | null>({
     queryKey: QueryKeys.user,
     queryFn: () => fetch('http://localhost:8080/api/user/authenticate', {
       method: 'POST',
       credentials: 'include',
     })
-      .then(handleResponse<{ user: FrontendUser | null}>)
-      .then(data => data.user || undefined),
+      .then(handleResponse<FrontendUser | null>('user')),
   });
 
   const providerValue = useMemo<UserContextValue>(() => ({
