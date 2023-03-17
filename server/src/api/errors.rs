@@ -6,24 +6,32 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct ErrorResponse {
-    error: &'static str
+    error: String
 }
 
 #[derive(Debug, Display, Error)]
 pub enum ApiError {
     #[display(fmt = "Unauthorized")]
     Unauthorized,
+
+    #[display(fmt = "Forbidden")]
+    Forbidden,
+
+    #[display(fmt = "Internal server error")]
+    InternalServerError,
 }
 
 impl error::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match *self {
-            ApiError::Unauthorized => StatusCode::UNAUTHORIZED
+            ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
+            ApiError::Forbidden => StatusCode::FORBIDDEN,
+            ApiError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
         }
     }
 
     fn error_response(&self) -> HttpResponse<BoxBody> {
         HttpResponse::build(self.status_code())
-            .json(ErrorResponse { error: "Internal server error" })
+            .json(ErrorResponse { error: self.to_string() })
     }
 }
