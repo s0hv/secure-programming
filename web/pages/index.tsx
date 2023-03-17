@@ -16,9 +16,23 @@ import {
 import { Post } from '@/components/Post';
 import { type Post as PostProps } from '@/types/api/post';
 import { useUser } from '@/utils/useUser';
+import { handleResponse } from '@/types/api/utilities';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '@/utils/constants';
 
 const Posts: FC = () => {
-  const x: PostProps = { userId: 'e2ff2afa', timestamp: '10:23', text: 'Lorem ipsum' };
+  const { data: posts, isFetching } = useQuery<PostProps[]>({
+    queryKey: QueryKeys.posts,
+    initialData: [],
+    queryFn: () => fetch('http://localhost:8080/api/posts', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(handleResponse<PostProps[]>('posts')),
+  });
+
   return (
     <Container
       component='main'
@@ -40,42 +54,17 @@ const Posts: FC = () => {
         alignItems='center'
         spacing={4}
       >
-        <Post {...x} />
-        <Post
-          userId='ddddd'
-          timestamp='9:33'
-          text='aaaaaaaaaaaaaaaaaaaaa'
-        />
-        <Skeleton
-          variant='rectangular'
-          width={510}
-          height={180}
-          animation={false}
-        />
-        <Skeleton
-          variant='rectangular'
-          width={510}
-          height={160}
-          animation={false}
-        />
-        <Skeleton
-          variant='rectangular'
-          width={510}
-          height={190}
-          animation={false}
-        />
-        <Skeleton
-          variant='rectangular'
-          width={510}
-          height={190}
-          animation={false}
-        />
-        <Skeleton
-          variant='rectangular'
-          width={510}
-          height={190}
-          animation={false}
-        />
+        { isFetching ? (
+          new Array(10).fill(1).map((_, idx) => (
+            <Skeleton
+              key={idx}
+              variant='rectangular'
+              width={500}
+              height={190}
+            />
+          ))) : (
+          posts.slice(0).reverse().map((el) => (
+            <Post key={el.postId} {...el} />)))}
       </Stack>
     </Container>
   );
@@ -85,6 +74,7 @@ const NewPostButton: FC = () => {
   const [open, setOpen] = useState(false);
   const [postValid, setPostValid] = useState(true);
   const postText = useRef<HTMLInputElement>();
+  const queryClient = useQueryClient();
 
   const handleClickOpen = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -102,7 +92,7 @@ const NewPostButton: FC = () => {
     } else {
       handleClose(event);
       console.log(`Make a new post with userid, timestamp, and content: ${postText.current?.value}`);
-      // window.location.reload();
+      // return queryClient.invalidateQueries({ queryKey: QueryKeys.posts });
     }
   };
 
