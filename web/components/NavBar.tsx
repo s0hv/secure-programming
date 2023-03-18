@@ -1,6 +1,7 @@
 import { FC } from 'react';
-import { AppBar, Box, Button, Link, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useUser } from '@/utils/useUser';
+import Link from '@/components/Link';
 
 
 export const NavBar: FC = () => {
@@ -26,13 +27,13 @@ export const NavBar: FC = () => {
           </Typography>
           { isAuthenticated ? (
             <>
-              <Button color='inherit' href='/profile'>Profile</Button>
-              <Button color='inherit' href='/'>Logout</Button>
+              <Button color='inherit' href='/profile' component={Link}>Profile</Button>
+              <Button color='inherit' href='/' component={Link}>Logout</Button>
             </>
           ) : (
             <>
-              <Button color='inherit' href='/login'>Login</Button>
-              <Button color='inherit' href='/signup'>Sign up</Button>
+              <Button color='inherit' href='/login' component={Link}>Login</Button>
+              <Button color='inherit' href='/signup' component={Link}>Sign up</Button>
             </>
           )}
         </Toolbar>

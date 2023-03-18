@@ -14,6 +14,7 @@ specifiers:
   '@types/react-dom': 18.0.11
   '@typescript-eslint/eslint-plugin': ^5.54.1
   '@typescript-eslint/parser': ^5.54.1
+  clsx: ^1.2.1
   eslint: 8.36.0
   eslint-config-airbnb: ^19.0.4
   eslint-config-next: 13.2.4
@@ -41,6 +42,7 @@ dependencies:
   '@types/react-dom': 18.0.11
   '@typescript-eslint/eslint-plugin': 5.54.1_4rfaf6mlw2mmutqjcopwvbftpu
   '@typescript-eslint/parser': 5.54.1_vgl77cfdswitgr47lm5swmv43m
+  clsx: 1.2.1
   eslint: 8.36.0
   eslint-config-airbnb: 19.0.4_guhfqc3yvckhutqwrddiy54d5i
   eslint-config-next: 13.2.4_vgl77cfdswitgr47lm5swmv43m

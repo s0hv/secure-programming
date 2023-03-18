@@ -17,6 +17,7 @@ import {
 import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
 import { QueryKeys } from '@/utils/constants';
+import { csrfHeader, CSRFProvider } from '@/utils/useCsrf';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -34,11 +35,24 @@ export interface MyAppProps extends AppProps {
 }
 
 const Root: FC<PropsWithChildren> = ({ children }) => {
+  const { data: csrf } = useQuery({
+    queryKey: QueryKeys.csrf,
+    retry: false,
+    queryFn: () => fetch('http://localhost:8080/api/auth/csrf', {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then(handleResponse<string>('csrf')),
+  });
+
   const { data: user, isFetching } = useQuery<FrontendUser | null>({
     queryKey: QueryKeys.user,
+    retry: false,
+    enabled: !!csrf,
     queryFn: () => fetch('http://localhost:8080/api/user/authenticate', {
       method: 'POST',
       credentials: 'include',
+      headers: csrfHeader(csrf),
     })
       .then(handleResponse<FrontendUser | null>('user')),
   });
@@ -49,9 +63,11 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
   }), [user, isFetching]);
 
   return (
-    <UserProvider value={providerValue}>
-      {children}
-    </UserProvider>
+    <CSRFProvider value={csrf}>
+      <UserProvider value={providerValue}>
+        {children}
+      </UserProvider>
+    </CSRFProvider>
   );
 };
 

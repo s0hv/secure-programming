@@ -48,7 +48,7 @@ module.exports = {
       html: true,
     }],
     indent: ['error', 2],
-    'react/jsx-max-props-per-line': ['error', { maximum: { single: 2, multi: 1 }}],
+    'react/jsx-max-props-per-line': ['error', { maximum: { single: 3, multi: 1 }}],
     'react/jsx-first-prop-new-line': ['error', 'multiline-multiprop'],
     'react/jsx-closing-bracket-location': ['error', 'line-aligned'],
     'comma-dangle': ['warn', {
@@ -82,5 +82,6 @@ module.exports = {
     'no-multiple-empty-lines': 'off',
     'implicit-arrow-linebreak': 'off',
     'import/prefer-default-export': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
   },
 };

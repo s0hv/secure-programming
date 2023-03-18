@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Container,
-  Link,
   TextField,
   Typography,
 } from '@mui/material';
@@ -14,12 +13,17 @@ import { handleResponse } from '@/types/api/utilities';
 import type { FrontendUser } from '@/types/api/user';
 import { useUser } from '@/utils/useUser';
 import { useRouter } from 'next/router';
+import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
+import { useQueryClient } from '@tanstack/react-query';
+import Link from '@/components/Link';
 
 const LoginForm: FC = () => {
   const PWRef = useRef<HTMLInputElement>();
   const [alert, setAlert] = useState(false);
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { setUser } = useUser();
+  const csrf = useCSRF();
 
   const loginUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,11 +41,12 @@ const LoginForm: FC = () => {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...csrfHeader(csrf),
       },
-      redirect: 'manual',
       body: JSON.stringify(body),
     }).then(handleResponse<FrontendUser>())
       .then(setUser)
+      .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
         setAlert(false);
         return router.push('/');

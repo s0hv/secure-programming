@@ -1,14 +1,8 @@
 import Head from 'next/head';
-import {
-  Box,
-  Button,
-  Container,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Container, TextField, Typography, } from '@mui/material';
 import { FC } from 'react';
 import { NavBar } from '@/components/NavBar';
+import Link from '@/components/Link';
 
 const SignUpForm: FC = () => {
   return (
