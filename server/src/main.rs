@@ -1,20 +1,23 @@
 use actix_cors::Cors;
-use actix_session::SessionMiddleware;
 use actix_session::config::PersistentSession;
+use actix_session::SessionMiddleware;
 use actix_web::{App, HttpServer, web};
 use actix_web::cookie::Key;
 use actix_web::middleware::Logger;
+use data_encoding::BASE64;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
 use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
 use crate::api::user::authenticate;
 use crate::db::session_store::{clear_old_sessions, PostgresSessionStore};
+use crate::middleware::CsrfMiddleware;
 use crate::models::AppState;
 
 mod db;
 mod models;
 mod api;
+mod middleware;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -34,6 +37,17 @@ async fn main() -> std::io::Result<()> {
         Ok(val) => Key::from(val.as_bytes()),
         Err(_) => {
             eprintln!("SESSION_SECRET environment variable must be defined");
+            return Ok(())
+        }
+    };
+
+    let csrf_secret: [u8; 32] = match std::env::var("CSRF_SECRET") {
+        Ok(val) => BASE64.decode(val.as_bytes())
+            .expect("CSRF_SECRET should be valid a base64 encoded string")
+            .try_into()
+            .expect("CSRF_SECRET must be exactly 32 bytes long"),
+        Err(_) => {
+            eprintln!("CSRF_SECRET environment variable must be defined");
             return Ok(())
         }
     };
@@ -66,8 +80,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(AppState {
                 pool: pool.clone()
             }))
-            .wrap(cors)
-            .wrap(Logger::default())
+            // Middleware is executed in reverse order
+            .wrap(CsrfMiddleware::new(&csrf_secret))
             .wrap(SessionMiddleware::builder(
                 PostgresSessionStore::new(pool.clone()),
                 secret_key.clone()
@@ -75,7 +89,8 @@ async fn main() -> std::io::Result<()> {
                 .session_lifecycle(PersistentSession::default())
                 .build()
             )
-
+            .wrap(cors)
+            .wrap(Logger::default())
             .service(web::scope("/api/auth").configure(api::auth::config))
             .service(web::scope("/api/posts").configure(api::posts::config))
             .service(

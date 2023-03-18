@@ -2,13 +2,17 @@ use actix_session::Session;
 use actix_web::{HttpResponse, post, Result, web};
 use actix_web::http::{header, StatusCode};
 use header::LOCATION;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::db;
+use crate::middleware::Csrf;
 use crate::models::AppState;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(login);
+    cfg
+        .service(login)
+        .service(logout)
+        .service(get_csrf);
 }
 
 #[derive(Deserialize)]
@@ -40,4 +44,16 @@ async fn logout(session: Session) -> HttpResponse {
     HttpResponse::SeeOther()
         .insert_header((LOCATION, "/"))
         .finish()
+}
+
+#[derive(Serialize)]
+struct CsrfResponse {
+    csrf: String,
+}
+
+#[post("/csrf")]
+async fn get_csrf(session: Session, csrf: Csrf) -> Result<HttpResponse> {
+    let token = csrf.get_token(session)?;
+
+    Ok(HttpResponse::Ok().json(CsrfResponse { csrf: token }))
 }
