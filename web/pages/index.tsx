@@ -17,7 +17,7 @@ import { Post } from '@/components/Post';
 import { type Post as PostProps } from '@/types/api/post';
 import { useUser } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/constants';
 
 const Posts: FC = () => {
@@ -57,7 +57,7 @@ const Posts: FC = () => {
         { isFetching ? (
           new Array(10).fill(1).map((_, idx) => (
             <Skeleton
-              key={idx}
+              key={idx /* eslint-disable-line react/no-array-index-key */}
               variant='rectangular'
               width={500}
               height={190}
@@ -74,7 +74,6 @@ const NewPostButton: FC = () => {
   const [open, setOpen] = useState(false);
   const [postValid, setPostValid] = useState(true);
   const postText = useRef<HTMLInputElement>();
-  const queryClient = useQueryClient();
 
   const handleClickOpen = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -128,8 +127,8 @@ const NewPostButton: FC = () => {
             helperText={!postValid && 'Invalid entry'}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} sx={{ position: 'absolute', left: '02%' }}>Cancel</Button>
+        <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button variant='contained' onClick={handlePost}>Post</Button>
         </DialogActions>
       </Dialog>
