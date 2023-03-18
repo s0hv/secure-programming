@@ -9,7 +9,9 @@ use actix_web::{dev::{forward_ready, Service, ServiceRequest, ServiceResponse, T
 use actix_web::body::EitherBody;
 use actix_web::dev::{Extensions, Payload};
 use actix_web::http::{Method, StatusCode};
-use csrf::{AesGcmCsrfProtection, CsrfProtection};
+// AES not used as it might be vulnerable to timing based attacks and is more brittle overall.
+// Might not perform as well but that is of no concern.
+use csrf::{ChaCha20Poly1305CsrfProtection, CsrfProtection};
 use data_encoding::BASE64;
 use derive_more::Display;
 use futures_util::future::LocalBoxFuture;
@@ -66,7 +68,7 @@ impl Csrf {
     /// Generates a new session token. Tries to use the previous token as the base if it can be parsed.
     /// Otherwise a fresh new token pair is generated.
     pub fn get_token(&self, session: Session) -> Result<String, Error> {
-        let protection = AesGcmCsrfProtection::from_key(self.0.borrow().secret);
+        let protection = ChaCha20Poly1305CsrfProtection::from_key(self.0.borrow().secret);
         let prev_token: Option<[u8; 64]> = match session.get::<String>("csrf")?
             .map(|v| BASE64.decode(v.as_bytes()).ok())
         {
@@ -228,7 +230,7 @@ where
                 None => return Ok(req.error_response(CsrfError::CsrfMissing).map_into_right_body())
             };
 
-            let protection = AesGcmCsrfProtection::from_key(config.secret);
+            let protection = ChaCha20Poly1305CsrfProtection::from_key(config.secret);
 
             let parsed_csrf = match protection.parse_cookie(&csrf) {
                 Ok(v) => v,
