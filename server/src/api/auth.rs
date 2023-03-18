@@ -31,6 +31,7 @@ async fn login(session: Session, data: web::Data<AppState>, form: web::Json<Logi
     };
 
     session.renew();
+    session.remove("csrf");
     session.insert("user_id", user.user_id.clone())?;
 
     Ok(HttpResponse::Ok()
