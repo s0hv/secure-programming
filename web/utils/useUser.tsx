@@ -12,7 +12,7 @@ export type UserContextValue = {
 export type UseUser = () => UserContextValue & {
   isAuthenticated: boolean
   isAdmin: boolean
-  setUser: (user: FrontendUser | undefined) => void
+  setUser: (user: FrontendUser | null | undefined) => void
 }
 
 const UserContext = createContext<UserContextValue>({ isFetching: false });
@@ -22,7 +22,7 @@ export const useUser: UseUser = () => {
   const { user, isFetching } = useContext(UserContext);
   const client = useQueryClient();
 
-  const setUser = useCallback((newUser: FrontendUser | undefined) => {
+  const setUser = useCallback((newUser: FrontendUser | null | undefined) => {
     client.setQueryData(QueryKeys.user, newUser);
   }, [client]);
 
