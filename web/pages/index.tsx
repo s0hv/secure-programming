@@ -163,9 +163,7 @@ export default function Home() {
       <Posts />
       { isAuthenticated ? (
         <NewPostButton />
-      ) : (
-        <NewPostButton />
-      )}
+      ) : null}
     </>
   );
 }
