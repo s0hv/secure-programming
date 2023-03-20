@@ -17,8 +17,9 @@ import { Post } from '@/components/Post';
 import { type Post as PostProps } from '@/types/api/post';
 import { useUser } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/constants';
+import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 
 const Posts: FC = () => {
   const { data: posts, isFetching } = useQuery<PostProps[]>({
@@ -74,6 +75,8 @@ const NewPostButton: FC = () => {
   const [open, setOpen] = useState(false);
   const [postValid, setPostValid] = useState(true);
   const postText = useRef<HTMLInputElement>();
+  const csrf = useCSRF();
+  const queryClient = useQueryClient();
 
   const handleClickOpen = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -91,7 +94,20 @@ const NewPostButton: FC = () => {
     } else {
       handleClose(event);
       console.log(`Make a new post with userid, timestamp, and content: ${postText.current?.value}`);
-      // return queryClient.invalidateQueries({ queryKey: QueryKeys.posts });
+      const body: Record<string, unknown> = {};
+      body.text = postText.current?.value;
+      fetch('http://localhost:8080/api/posts/create', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...csrfHeader(csrf),
+        },
+        body: JSON.stringify(body),
+      }).then(() => invalidateCsrfToken(queryClient))
+        .then(() => {
+          return queryClient.invalidateQueries({ queryKey: QueryKeys.posts });
+        });
     }
   };
 
