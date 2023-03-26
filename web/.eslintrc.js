@@ -66,6 +66,7 @@ module.exports = {
     ],
 
     'react/react-in-jsx-scope': 'off',
+    'react/jsx-one-expression-per-line': 'off',
     'linebreak-style': 'off',
     'max-classes-per-file': 'off',
     'prefer-destructuring': 'off',
