@@ -9,7 +9,6 @@ use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
 use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
-use crate::api::user::authenticate;
 use crate::db::session_store::{clear_old_sessions, PostgresSessionStore};
 use crate::middleware::CsrfMiddleware;
 use crate::models::AppState;
@@ -93,10 +92,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(web::scope("/api/auth").configure(api::auth::config))
             .service(web::scope("/api/posts").configure(api::posts::config))
-            .service(
-                web::scope("/api/user")
-                    .service(authenticate)
-            )
+            .service(web::scope("/api/user").configure(api::user::config))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

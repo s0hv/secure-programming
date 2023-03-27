@@ -52,7 +52,7 @@ struct CreatePostResponse {
 
 #[post("/create")]
 pub async fn create_post(session: Session, data: web::Data<AppState>, body: Json<CreatePost>) -> Result<HttpResponse, Error> {
-    let user_id = require_user(session).await?;
+    let user_id = require_user(&session).await?;
     let post_id = db::posts::create_post(&data.get_client().await?, &user_id, &body.text).await?;
 
     Ok(HttpResponse::Ok().json(CreatePostResponse { post_id }))
@@ -70,7 +70,7 @@ struct DeletePostResponse {
 
 #[delete("/delete/{post_id}")]
 pub async fn delete_post(session: Session, path: web::Path<DeletePostData>, data: web::Data<AppState>) -> Result<HttpResponse, Error> {
-    let user_id = require_user(session).await?;
+    let user_id = require_user(&session).await?;
     let client = data.get_client().await?;
 
     match db::posts::post_belongs_to_user(&client, &user_id, &path.post_id).await? {
