@@ -6,7 +6,7 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct ErrorResponse {
-    error: String
+    pub error: String
 }
 
 #[derive(Debug, Display, Error)]
