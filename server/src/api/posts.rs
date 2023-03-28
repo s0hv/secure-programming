@@ -15,6 +15,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(get_posts)
         .service(create_post)
+        .service(delete_post_admin)
         .service(delete_post);
 }
 
@@ -83,6 +84,25 @@ pub async fn delete_post(session: Session, path: web::Path<DeletePostData>, data
     }
 
     db::posts::delete_post(&client, &user_id, &path.post_id).await?;
+
+    Ok(HttpResponse::Ok().json(DeletePostResponse { message: "Post deleted" }))
+}
+
+#[delete("/delete/{post_id}/admin")]
+pub async fn delete_post_admin(session: Session, path: web::Path<DeletePostData>, data: web::Data<AppState>) -> Result<HttpResponse, Error> {
+    let user_id = require_user(&session).await?;
+    let client = data.get_client().await?;
+
+    match db::user::get_user(&client, &user_id).await? {
+        Some(user) => {
+            if !user.admin {
+                return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized".into() }))
+            }
+        }
+        None => return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized".into() }))
+    };
+
+    db::posts::delete_post_admin(&client, &path.post_id).await?;
 
     Ok(HttpResponse::Ok().json(DeletePostResponse { message: "Post deleted" }))
 }

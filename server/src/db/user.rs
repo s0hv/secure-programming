@@ -5,9 +5,10 @@ use uuid::Uuid;
 use crate::db::errors::DbError;
 use crate::db::models::User;
 
-pub async fn get_user(client: &Client, user_id: Uuid) -> Result<Option<User>, DbError> {
-    // language=postgresql
-    let row = client.query_opt("SELECT user_id, username, email, admin FROM users WHERE user_id=$1", &[&user_id])
+pub async fn get_user(client: &Client, user_id: &Uuid) -> Result<Option<User>, DbError> {
+    let row = client.query_opt(
+        // language=postgresql
+        "SELECT user_id, username, email, admin FROM users WHERE user_id=$1", &[&user_id])
         .await
         .map_err(|err| {
             debug!("Error while gettimg user. {}", err);

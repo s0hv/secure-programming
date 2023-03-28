@@ -26,7 +26,7 @@ struct UserResponse {
 #[post("/authenticate")]
 pub async fn authenticate(session: Session, data: web::Data<AppState>) -> Result<HttpResponse, error::Error> {
     if let Some(user_id) = session.get::<Uuid>("user_id")? {
-        let user = get_user(&data.get_client().await?, user_id).await?;
+        let user = get_user(&data.get_client().await?, &user_id).await?;
         if user.is_none() {
             return Err(error::Error::from(ApiError::Unauthorized))
         }
