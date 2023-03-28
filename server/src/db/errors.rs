@@ -14,6 +14,9 @@ pub enum DbError {
     #[display(fmt = "Internal server error")]
     InternalError,
 
+    #[display(fmt = "Entry already exists")]
+    DuplicateError,
+
     #[display(fmt = "Failed to connect to db")]
     ConnectError,
 }

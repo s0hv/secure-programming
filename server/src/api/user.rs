@@ -15,6 +15,7 @@ use crate::models::AppState;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(authenticate)
+        .service(create_account)
         .service(change_password);
 }
 
@@ -62,4 +63,33 @@ pub async fn change_password(session: Session, data: web::Data<AppState>, body: 
     } else {
         Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Password invalid".into() }))
     }
+}
+
+#[derive(Deserialize, Validate)]
+pub struct CreateAccountData {
+    #[validate(length(min = 1, max = 32))]
+    username: String,
+    #[validate(length(min = 8, max = 72))]
+    password: String,
+    #[validate(email)]
+    email: String,
+}
+
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CreateAccountResponse {
+    user_id: Uuid,
+}
+
+
+#[post("/createaccount")]
+pub async fn create_account(
+    data: web::Data<AppState>,
+    body: Json<CreateAccountData>,
+) -> Result<HttpResponse, error::Error> {
+    let client = data.get_client().await?;
+    let user_id = db::user::create_account(&client, &body.username, &body.email, &body.password).await?;
+
+    Ok(HttpResponse::Ok().json(CreateAccountResponse { user_id }))
 }
