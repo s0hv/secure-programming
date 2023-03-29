@@ -4,6 +4,8 @@ use actix_web::http::{header, StatusCode};
 use header::LOCATION;
 use serde::{Deserialize, Serialize};
 
+use crate::api::errors::ErrorResponse;
+use crate::api::utilities::get_session_user;
 use crate::db;
 use crate::middleware::Csrf;
 use crate::models::AppState;
@@ -23,6 +25,10 @@ struct LoginForm {
 
 #[post("/login")]
 async fn login(session: Session, data: web::Data<AppState>, form: web::Json<LoginForm>) -> Result<HttpResponse> {
+    if get_session_user(&session)?.is_some() {
+        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in".into() }));
+    }
+
     let user = db::user::authenticate(&data.get_client().await?, &form.email, &form.password).await?;
 
     let user = match user {

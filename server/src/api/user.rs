@@ -6,7 +6,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::api::errors::{ApiError, ErrorResponse};
-use crate::api::utilities::require_user;
+use crate::api::utilities::{get_session_user, require_user};
 use crate::db;
 use crate::db::models::User;
 use crate::db::user::get_user;
@@ -53,7 +53,7 @@ pub struct ChangePasswordData {
 
 #[post("/changepassword")]
 pub async fn change_password(session: Session, data: web::Data<AppState>, body: Json<ChangePasswordData>) -> Result<HttpResponse, error::Error> {
-    let user_id = require_user(&session).await?;
+    let user_id = require_user(&session)?;
     let client = data.get_client().await?;
 
     if db::user::change_password(&client, &user_id, &body.password, &body.new_password).await? {
@@ -85,11 +85,27 @@ struct CreateAccountResponse {
 
 #[post("/createaccount")]
 pub async fn create_account(
+    session: Session,
     data: web::Data<AppState>,
     body: Json<CreateAccountData>,
 ) -> Result<HttpResponse, error::Error> {
+    if get_session_user(&session)?.is_some() {
+        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in".into() }));
+    }
+
     let client = data.get_client().await?;
     let user_id = db::user::create_account(&client, &body.username, &body.email, &body.password).await?;
 
-    Ok(HttpResponse::Ok().json(CreateAccountResponse { user_id }))
+    session.renew();
+    session.remove("csrf");
+    session.insert("user_id", user_id.clone())?;
+
+    Ok(HttpResponse::Ok().json(UserResponse {
+        user: Some(User {
+            user_id,
+            username: body.username.clone(),
+            email: body.email.clone(),
+            admin: false,
+        })
+    }))
 }
