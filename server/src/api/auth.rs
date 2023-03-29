@@ -26,7 +26,7 @@ struct LoginForm {
 #[post("/login")]
 async fn login(session: Session, data: web::Data<AppState>, form: web::Json<LoginForm>) -> Result<HttpResponse> {
     if get_session_user(&session)?.is_some() {
-        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in".into() }));
+        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in" }));
     }
 
     let user = db::user::authenticate(&data.get_client().await?, &form.email, &form.password).await?;

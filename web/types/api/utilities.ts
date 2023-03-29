@@ -39,7 +39,7 @@ export const getResponseData = async <T = unknown>(json: any, dataKey: string | 
     error = error[0];
   }
 
-  throw new APIException(error.msg || error);
+  throw new APIException(error.message || error);
 };
 
 type HandleResponse = {

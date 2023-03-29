@@ -77,10 +77,10 @@ pub async fn delete_post(session: Session, path: web::Path<DeletePostData>, data
     match db::posts::post_belongs_to_user(&client, &user_id, &path.post_id).await? {
         Some(is_users) => {
             if !is_users {
-                return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "You are not the owner of this post".into() }))
+                return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "You are not the owner of this post" }))
             }
         }
-        None => return Ok(HttpResponse::NotFound().json(ErrorResponse { error: "Post not found".into() }))
+        None => return Ok(HttpResponse::NotFound().json(ErrorResponse { error: "Post not found" }))
     }
 
     db::posts::delete_post(&client, &user_id, &path.post_id).await?;
@@ -96,10 +96,10 @@ pub async fn delete_post_admin(session: Session, path: web::Path<DeletePostData>
     match db::user::get_user(&client, &user_id).await? {
         Some(user) => {
             if !user.admin {
-                return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized".into() }))
+                return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized" }))
             }
         }
-        None => return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized".into() }))
+        None => return Ok(HttpResponse::Unauthorized().json(ErrorResponse { error: "Unauthorized" }))
     };
 
     db::posts::delete_post_admin(&client, &path.post_id).await?;

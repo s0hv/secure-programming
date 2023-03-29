@@ -62,7 +62,7 @@ pub async fn change_password(session: Session, data: web::Data<AppState>, body: 
         session.renew();
         Ok(HttpResponse::Ok().finish())
     } else {
-        Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Password invalid".into() }))
+        Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Password invalid" }))
     }
 }
 
@@ -91,7 +91,7 @@ pub async fn create_account(
     body: Json<CreateAccountData>,
 ) -> Result<HttpResponse, error::Error> {
     if get_session_user(&session)?.is_some() {
-        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in".into() }));
+        return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Already logged in" }));
     }
 
     let client = data.get_client().await?;

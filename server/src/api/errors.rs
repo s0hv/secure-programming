@@ -5,8 +5,8 @@ use derive_more::{Display, Error};
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct ErrorResponse {
-    pub error: String
+pub struct ErrorResponse<T> where T: Serialize {
+    pub error: T
 }
 
 #[derive(Debug, Display, Error)]
@@ -33,5 +33,30 @@ impl error::ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse<BoxBody> {
         HttpResponse::build(self.status_code())
             .json(ErrorResponse { error: self.to_string() })
+    }
+}
+
+#[derive(Serialize)]
+struct FieldError {
+    field: String,
+    messages: Vec<String>,
+}
+
+#[derive(Serialize)]
+pub struct ValidationErrorJsonPayload {
+    message: String,
+    fields: Vec<FieldError>,
+}
+
+// Map validation errors into json for easier machine readability
+impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
+    fn from(error: &validator::ValidationErrors) -> Self {
+        ValidationErrorJsonPayload {
+            message: "Validation error".to_owned(),
+            fields: error.field_errors().iter().map(|(field, errors)| FieldError {
+                field: field.to_string(),
+                messages: errors.iter().map(|e| e.code.to_string()).collect(),
+            }).collect(),
+        }
     }
 }
