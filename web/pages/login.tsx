@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { FC, FormEvent, useRef, useState } from 'react';
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { handleResponse } from '@/types/api/utilities';
 import type { FrontendUser } from '@/types/api/user';
@@ -22,13 +22,11 @@ const LoginForm: FC = () => {
   const [alert, setAlert] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { setUser } = useUser();
+  const { setUser, isLoading, isAuthenticated } = useUser();
   const csrf = useCSRF();
 
   const loginUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('Validate PW, authenticate, on success take to landing page,' +
-      ' else clear password, give error message');
 
     const formData = new FormData(event.target as HTMLFormElement);
     const body: Record<string, unknown> = {};
@@ -51,7 +49,8 @@ const LoginForm: FC = () => {
         setAlert(false);
         return router.push('/');
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         if (PWRef.current) {
           PWRef.current.value = '';
         }
@@ -80,27 +79,39 @@ const LoginForm: FC = () => {
           severity='error'
           sx={{ margin: 'auto' }}
         >
-          Login failed; Invalid username or password.
+          Login failed; Invalid email or password.
         </Alert>
       ) : null}
       <TextField
+        required
+        InputLabelProps={{ required: false }}
         name='email'
         label='Email'
         sx={{ mb: 2 }}
       />
       <TextField
+        required
+        InputLabelProps={{ required: false }}
         name='password'
         type='password'
         label='Password'
         inputRef={PWRef}
         sx={{ mb: 2 }}
       />
-      <Button variant='contained' type='submit'>Log in</Button>
+      <Button variant='contained' type='submit' disabled={isLoading || isAuthenticated}>Log in</Button>
     </Box>
   );
 };
 
 export default function Login() {
+  const { isAuthenticated } = useUser();
+  const router = useRouter();
+
+  // Redirect an already logged-in user to the landing page
+  useEffect(() => {
+    if (isAuthenticated) router.push('/');
+  });
+
   return (
     <>
       <Head>
