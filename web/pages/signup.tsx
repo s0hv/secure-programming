@@ -9,6 +9,7 @@ import { FrontendUser } from '@/types/api/user';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/utils/useUser';
 import { useRouter } from 'next/router';
+import { PasswordField } from '@/components/PasswordField';
 
 const SignUpForm: FC = () => {
   const [alert, setAlert] = useState('');
@@ -80,13 +81,10 @@ const SignUpForm: FC = () => {
         inputProps={{ maxLength: 32 }}
         sx={{ mb: 2 }}
       />
-      <TextField
-        required
-        InputLabelProps={{ required: false }}
+      <PasswordField
+        strict
         name='password'
-        type='password'
         label='Password'
-        inputProps={{ minLength: 8, maxLength: 72 }}
         sx={{ mb: 2 }}
       />
       <TextField

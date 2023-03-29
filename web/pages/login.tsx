@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from '@/components/Link';
+import { PasswordField } from '@/components/PasswordField';
 
 const LoginForm: FC = () => {
   const PWRef = useRef<HTMLInputElement>();
@@ -89,11 +90,8 @@ const LoginForm: FC = () => {
         label='Email'
         sx={{ mb: 2 }}
       />
-      <TextField
-        required
-        InputLabelProps={{ required: false }}
+      <PasswordField
         name='password'
-        type='password'
         label='Password'
         inputRef={PWRef}
         sx={{ mb: 2 }}

@@ -4,13 +4,13 @@ import {
   Button,
   Container,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import { FC, FormEvent, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
 import { useUser } from '@/utils/useUser';
+import { PasswordField } from '@/components/PasswordField';
 
 
 const PasswordChange: FC = () => {
@@ -38,24 +38,23 @@ const PasswordChange: FC = () => {
       >
         Change Password
       </Typography>
-      <TextField
+      <PasswordField
         name='old'
         label='Old password'
-        type='password'
         sx={{ mb: 1 }}
       />
-      <TextField
+      <PasswordField
+        strict
         name='new'
         label='New password'
-        type='password'
         inputRef={newPWRef}
         onBlur={validateRepeatPassword}
         sx={{ mb: 1 }}
       />
-      <TextField
+      <PasswordField
+        strict
         name='repeat'
         label='Repeat new password'
-        type='password'
         helperText={!repeatValid && 'Passwords do not match'}
         error={!repeatValid}
         inputRef={repeatPWRef}
