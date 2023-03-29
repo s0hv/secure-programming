@@ -117,8 +117,6 @@ pub struct DeleteAccountBody {
     password: String
 }
 
-// delete request to /deleteaccount using actix-web
-// session deleted
 #[delete("/deleteaccount")]
 pub async fn delete_account(session: Session, data: web::Data<AppState>, body: Json<DeleteAccountBody>) -> Result<HttpResponse, error::Error> {
     let user_id = require_user(&session)?;
