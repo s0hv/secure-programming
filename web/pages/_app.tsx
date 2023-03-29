@@ -45,7 +45,7 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
       .then(handleResponse<string>('csrf')),
   });
 
-  const { data: user, isFetching } = useQuery<FrontendUser | null>({
+  const { data: user, isInitialLoading } = useQuery<FrontendUser | null>({
     queryKey: QueryKeys.user,
     retry: false,
     enabled: !!csrf,
@@ -59,8 +59,8 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
 
   const providerValue = useMemo<UserContextValue>(() => ({
     user,
-    isFetching,
-  }), [user, isFetching]);
+    isLoading: isInitialLoading,
+  }), [user, isInitialLoading]);
 
   return (
     <CSRFProvider value={csrf}>

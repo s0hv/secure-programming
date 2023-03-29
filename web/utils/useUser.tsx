@@ -6,7 +6,7 @@ import { QueryKeys } from '@/utils/constants';
 
 export type UserContextValue = {
   user?: FrontendUser | null
-  isFetching: boolean
+  isLoading: boolean
 }
 
 export type UseUser = () => UserContextValue & {
@@ -15,11 +15,11 @@ export type UseUser = () => UserContextValue & {
   setUser: (user: FrontendUser | null | undefined) => void
 }
 
-const UserContext = createContext<UserContextValue>({ isFetching: false });
+const UserContext = createContext<UserContextValue>({ isLoading: false });
 export const UserProvider = UserContext.Provider;
 
 export const useUser: UseUser = () => {
-  const { user, isFetching } = useContext(UserContext);
+  const { user, isLoading } = useContext(UserContext);
   const client = useQueryClient();
 
   const setUser = useCallback((newUser: FrontendUser | null | undefined) => {
@@ -30,7 +30,7 @@ export const useUser: UseUser = () => {
     user,
     isAuthenticated: !!user,
     isAdmin: !!user?.admin,
-    isFetching,
+    isLoading,
     setUser,
-  }), [user, isFetching, setUser]);
+  }), [user, isLoading, setUser]);
 };
