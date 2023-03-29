@@ -45,10 +45,12 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
       .then(handleResponse<string>('csrf')),
   });
 
+  const csrfLoading = typeof csrf !== 'string';
+
   const { data: user, isInitialLoading } = useQuery<FrontendUser | null>({
     queryKey: QueryKeys.user,
     retry: false,
-    enabled: !!csrf,
+    enabled: !csrfLoading,
     queryFn: () => fetch('http://localhost:8080/api/user/authenticate', {
       method: 'POST',
       credentials: 'include',
@@ -57,10 +59,12 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
       .then(handleResponse<FrontendUser | null>('user')),
   });
 
+  const isLoading = isInitialLoading || csrfLoading;
+
   const providerValue = useMemo<UserContextValue>(() => ({
     user,
-    isLoading: isInitialLoading,
-  }), [user, isInitialLoading]);
+    isLoading,
+  }), [user, isLoading]);
 
   return (
     <CSRFProvider value={csrf}>
