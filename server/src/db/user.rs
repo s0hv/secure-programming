@@ -75,3 +75,20 @@ pub async fn create_account(client: &Client, username: &String, email: &String, 
 
     Ok(row.get("user_id"))
 }
+
+pub async fn delete_account(client: &Client, user_id: &Uuid, password: &String) -> Result<bool, DbError> {
+    let result = client.execute(
+        // language=postgresql
+        "DELETE FROM users WHERE user_id=$1 AND pwhash=crypt($2, pwhash)", &[&user_id, &password])
+        .await
+        .map_err(|err| {
+            debug!("Error while deleting account. {}", err);
+            DbError::InternalError
+        })?;
+
+    if result == 0 {
+        Ok(false)
+    } else {
+        Ok(true)
+    }
+}

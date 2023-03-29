@@ -1,5 +1,5 @@
 use actix_session::Session;
-use actix_web::{error, HttpResponse, post, Result, web};
+use actix_web::{delete, error, HttpResponse, post, Result, web};
 use actix_web_validator::Json;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -16,6 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(authenticate)
         .service(create_account)
+        .service(delete_account)
         .service(change_password);
 }
 
@@ -108,4 +109,24 @@ pub async fn create_account(
             admin: false,
         })
     }))
+}
+
+#[derive(Deserialize, Validate)]
+pub struct DeleteAccountBody {
+    #[validate(length(min = 1, max = 72))]
+    password: String
+}
+
+// delete request to /deleteaccount using actix-web
+// session deleted
+#[delete("/deleteaccount")]
+pub async fn delete_account(session: Session, data: web::Data<AppState>, body: Json<DeleteAccountBody>) -> Result<HttpResponse, error::Error> {
+    let user_id = require_user(&session)?;
+    let client = data.get_client().await?;
+
+    db::user::delete_account(&client, &user_id, &body.password).await?;
+
+    session.purge();
+
+    Ok(HttpResponse::Ok().finish())
 }
