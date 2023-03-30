@@ -64,8 +64,7 @@ const Posts: FC = () => {
               height={190}
             />
           ))) : (
-          posts.map((el) => (
-            <Post key={el.postId} {...el} />)))}
+          posts.map((el) => <Post key={el.postId} {...el} />))}
       </Stack>
     </Container>
   );
@@ -94,8 +93,9 @@ const NewPostButton: FC = () => {
     } else {
       handleClose(event);
       console.log(`Make a new post with userid, timestamp, and content: ${postText.current?.value}`);
-      const body: Record<string, unknown> = {};
-      body.text = postText.current?.value;
+      const body = {
+        text: postText.current?.value,
+      };
       fetch('http://localhost:8080/api/posts/create', {
         method: 'POST',
         credentials: 'include',

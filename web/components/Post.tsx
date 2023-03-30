@@ -1,5 +1,12 @@
 import { FC } from 'react';
-import { Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Typography
+} from '@mui/material';
 import { type Post as PostProps } from '@/types/api/post';
 import { formatTimestamp } from '@/utils/utilities';
 import { useUser } from '@/utils/useUser';
@@ -11,7 +18,6 @@ import { handleResponse } from '@/types/api/utilities';
 
 export const Post: FC<PostProps> = ({ user, text, timestamp, postId }) => {
   const { user: currentUser } = useUser();
-
 
   const csrf = useCSRF();
   const queryClient = useQueryClient();
