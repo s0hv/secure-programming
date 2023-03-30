@@ -1,16 +1,14 @@
 use actix_cors::Cors;
 use actix_session::config::PersistentSession;
 use actix_session::SessionMiddleware;
-use actix_web::{App, error, HttpResponse, HttpServer, web};
+use actix_web::{App, HttpServer, web};
 use actix_web::cookie::Key;
 use actix_web::middleware::Logger;
-use actix_web_validator::{Error, JsonConfig};
 use data_encoding::BASE64;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
 use dotenv::dotenv;
 use tokio_postgres::NoTls;
 
-use crate::api::errors::{ErrorResponse, ValidationErrorJsonPayload};
 use crate::db::session_store::{clear_old_sessions, PostgresSessionStore};
 use crate::middleware::CsrfMiddleware;
 use crate::models::AppState;
@@ -71,16 +69,7 @@ async fn main() -> std::io::Result<()> {
     let (handle, cance_token) = clear_old_sessions(config);
 
     // Json error handler for actix-web-validator
-    let json_config = JsonConfig::default()
-        .error_handler(|err, _req| {
-            match err {
-                Error::Validate(err) => error::InternalError::from_response(err.clone(),
-                    HttpResponse::BadRequest().json(
-                        ErrorResponse { error: ValidationErrorJsonPayload::from(&err) })
-                ).into(),
-                _ => error::InternalError::from_response(err, HttpResponse::BadRequest().finish()).into()
-            }
-        });
+    let json_config = api::errors::generate_json_config();
 
     HttpServer::new(move || {
         #[cfg(debug_assertions)]

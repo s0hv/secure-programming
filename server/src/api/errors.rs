@@ -1,6 +1,7 @@
 use actix_web::{error, HttpResponse};
 use actix_web::body::BoxBody;
 use actix_web::http::StatusCode;
+use actix_web_validator::JsonConfig;
 use derive_more::{Display, Error};
 use serde::Serialize;
 
@@ -59,4 +60,28 @@ impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
             }).collect(),
         }
     }
+}
+
+pub fn generate_json_config() -> JsonConfig {
+    JsonConfig::default()
+        .error_handler(|err, _req| {
+            match err {
+                // Validation error
+                actix_web_validator::Error::Validate(err) => error::InternalError::from_response(err.clone(),
+                    HttpResponse::BadRequest().json(
+                        ErrorResponse { error: ValidationErrorJsonPayload::from(&err) })
+                ).into(),
+
+                // Error with the json payload such as missing fields or invalid data types
+                actix_web_validator::Error::JsonPayloadError(err) => {
+                    let resp = match &err {
+                        // This error message should not have any sensitive information that the user does not already know
+                        error::JsonPayloadError::Deserialize(_) => ErrorResponse { error: err.to_string() },
+                        _ => ErrorResponse { error: "Invalid JSON payload".to_string() }
+                    };
+                    error::InternalError::from_response(err, HttpResponse::BadRequest().json(resp)).into()
+                },
+                _ => error::InternalError::from_response(err, HttpResponse::BadRequest().finish()).into()
+            }
+        })
 }
