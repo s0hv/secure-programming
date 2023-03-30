@@ -12,6 +12,7 @@ pub async fn get_posts(client: &Client, limit: i32, offset: i32) -> Result<Vec<P
         SELECT post_id, p.user_id, created_at as timestamp, data as text, u.username
         FROM posts p
         INNER JOIN users u on u.user_id = p.user_id
+        ORDER BY created_at DESC
         LIMIT $1::INT OFFSET $2::INT", &[&limit, &offset]
     )
         .await

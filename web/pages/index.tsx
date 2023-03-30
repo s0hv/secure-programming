@@ -64,7 +64,7 @@ const Posts: FC = () => {
               height={190}
             />
           ))) : (
-          posts.slice(0).reverse().map((el) => (
+          posts.map((el) => (
             <Post key={el.postId} {...el} />)))}
       </Stack>
     </Container>
