@@ -3,11 +3,11 @@ import {
   Alert,
   Box,
   Button,
-  Container,
+  Container, Dialog, DialogActions, DialogContent, DialogTitle,
   Stack,
   Typography,
 } from '@mui/material';
-import { FC, FormEvent, useEffect, useRef, useState } from 'react';
+import { FC, FormEvent, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
 import { useUser } from '@/utils/useUser';
@@ -31,7 +31,7 @@ const PasswordChange: FC = () => {
   const [sButtonDisabled, setSButtonDisabled] = useState(false);
   const changePassword = (event: FormEvent) => {
     event.preventDefault();
-    setAlert({success: alert.success, message: ''});
+    setAlert({ success: alert.success, message: '' });
     setSButtonDisabled(true);
 
     const formData = new FormData(event.target as HTMLFormElement);
@@ -51,11 +51,11 @@ const PasswordChange: FC = () => {
     }).then(handleResponse())
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
-        setAlert({success: true, message: 'Password changed successfully'});
+        setAlert({ success: true, message: 'Password changed successfully' });
         console.log('clear PW fields, notify user of password change');
       })
       .catch((e) => {
-        setAlert({success: false, message: e.message});
+        setAlert({ success: false, message: e.message });
       })
       .finally(() => {
         setSButtonDisabled(false);
@@ -116,19 +116,58 @@ const PasswordChange: FC = () => {
 
 const AccountDeletion: FC = () => {
   const confirm = useConfirm();
-  const { user } = useUser();
-  const confirmationkw = `delete ${user}`;
+  const { setUser, user } = useUser();
+  const queryClient = useQueryClient();
+  const confirmationkw = `delete ${user?.username}`;
+  const csrf = useCSRF();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [fieldError, setFieldError] = useState('');
   const confirmDelete = () => {
     confirm({
-      description: `To permanently delete the account, type "${confirmationkw}" and click Delete`,
+      description: `To permanently delete the account, type "${confirmationkw}" and click Proceed.`,
       confirmationKeyword: confirmationkw,
-      confirmationText: 'Delete',
+      confirmationText: 'Proceed',
     })
       .then(() => {
-        console.log('Handle delete on backend, then go to landing page');
+        setOpen(true);
       }).catch(() => {
-        /* ... */
+        console.log('Cancelled account deletion');
       });
+  };
+
+  const submitDelete = (event: FormEvent) => {
+    event.preventDefault();
+    setFieldError('');
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const body: Record<string, unknown> = {};
+    formData.forEach((val, key) => {
+      body[key] = val;
+    });
+
+    fetch('http://localhost:8080/api/user/deleteaccount', {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeader(csrf),
+      },
+      body: JSON.stringify(body),
+    }).then(handleResponse())
+      .then(() => setUser(null))
+      .then(() => invalidateCsrfToken(queryClient))
+      .then(() => {
+        console.log('redirect to landing page');
+        return router.push('/');
+      })
+      .catch((e) => {
+        setFieldError(e.message);
+      });
+  };
+  const handleClose = (event: SyntheticEvent) => {
+    event.preventDefault();
+    setOpen(false);
   };
 
   return (
@@ -140,6 +179,34 @@ const AccountDeletion: FC = () => {
       >
         Delete Account
       </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth='sm'
+      >
+        <DialogTitle>:(</DialogTitle>
+        <DialogContent>
+          <form id='deletion' onSubmit={submitDelete}>
+            <PasswordField
+              name='password'
+              label='Password'
+              helperText={fieldError}
+              error={!!fieldError}
+              sx={{ mt: 1 }}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button
+            variant='outlined'
+            color='error'
+            form='deletion'
+            type='submit'
+          >Delete Account
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Typography variant='body1'>Warning! Deleting your account is permanent.</Typography>
     </>
   );
