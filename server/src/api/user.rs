@@ -122,9 +122,11 @@ pub async fn delete_account(session: Session, data: web::Data<AppState>, body: J
     let user_id = require_user(&session)?;
     let client = data.get_client().await?;
 
-    db::user::delete_account(&client, &user_id, &body.password).await?;
-
-    session.purge();
-
-    Ok(HttpResponse::Ok().finish())
+    match db::user::delete_account(&client, &user_id, &body.password).await? {
+        true => {
+            session.purge();
+            Ok(HttpResponse::Ok().finish())
+        },
+        false => return Ok(HttpResponse::Forbidden().json(ErrorResponse { error: "Password invalid" }))
+    }
 }
