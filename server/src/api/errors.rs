@@ -20,6 +20,12 @@ pub enum ApiError {
 
     #[display(fmt = "Internal server error")]
     InternalServerError,
+
+    #[display(fmt = "Invalid credentials")]
+    WithMessage {
+        message: String,
+        status_code: StatusCode,
+    }
 }
 
 impl error::ResponseError for ApiError {
@@ -27,13 +33,19 @@ impl error::ResponseError for ApiError {
         match *self {
             ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
             ApiError::Forbidden => StatusCode::FORBIDDEN,
-            ApiError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+            ApiError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WithMessage { status_code, .. } => status_code.clone()
         }
     }
 
     fn error_response(&self) -> HttpResponse<BoxBody> {
+        let msg = match *self {
+            ApiError::WithMessage { ref message, .. } => message.clone(),
+            _ => self.to_string()
+        };
+
         HttpResponse::build(self.status_code())
-            .json(ErrorResponse { error: self.to_string() })
+            .json(ErrorResponse { error: msg })
     }
 }
 

@@ -1,5 +1,6 @@
 use actix_session::Session;
 use actix_web::{delete, error, HttpResponse, post, Result, web};
+use actix_web::http::StatusCode;
 use actix_web_validator::Json;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -95,7 +96,13 @@ pub async fn create_account(
     }
 
     let client = data.get_client().await?;
-    let user_id = db::user::create_account(&client, &body.username, &body.email, &body.password).await?;
+    let user_id = db::user::create_account(&client, &body.username, &body.email, &body.password).await
+        .map_err(|err| match &err {
+            db::errors::DbError::DuplicateKey => error::Error::from(
+                ApiError::WithMessage { message: "Email already in use".into(), status_code: StatusCode::BAD_REQUEST }
+            ),
+            _ => err.into()
+        })?;
 
     session.renew();
     session.remove("csrf");

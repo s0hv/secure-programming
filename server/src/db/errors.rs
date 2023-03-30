@@ -15,7 +15,7 @@ pub enum DbError {
     InternalError,
 
     #[display(fmt = "Entry already exists")]
-    DuplicateError,
+    DuplicateKey,
 
     #[display(fmt = "Failed to connect to db")]
     ConnectError,

@@ -66,7 +66,7 @@ pub async fn create_account(client: &Client, username: &String, email: &String, 
         .await
         .map_err(|err| {
             if err.code() == Some(&SqlState::UNIQUE_VIOLATION) {
-                return DbError::DuplicateError
+                return DbError::DuplicateKey
             }
 
             debug!("Error while creating account. {}", err);
