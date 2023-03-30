@@ -1,25 +1,65 @@
 import Head from 'next/head';
 import {
+  Alert,
   Box,
   Button,
   Container,
   Stack,
   Typography,
 } from '@mui/material';
-import { FC, FormEvent, useRef, useState } from 'react';
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
 import { useUser } from '@/utils/useUser';
 import { PasswordField } from '@/components/PasswordField';
+import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
+import { useQueryClient } from '@tanstack/react-query';
+import { handleResponse } from '@/types/api/utilities';
+import { useRouter } from 'next/router';
 
 
 const PasswordChange: FC = () => {
   const [repeatValid, setRepeatValid] = useState(true);
   const newPWRef = useRef<HTMLInputElement>();
   const repeatPWRef = useRef<HTMLInputElement>();
+  const csrf = useCSRF();
+  const queryClient = useQueryClient();
+  const [alert, setAlert] = useState({
+    success: false,
+    message: '',
+  });
+  const [sButtonDisabled, setSButtonDisabled] = useState(false);
   const changePassword = (event: FormEvent) => {
     event.preventDefault();
-    console.log('Validate old and new PW on backend and change');
+    setAlert({success: alert.success, message: ''});
+    setSButtonDisabled(true);
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const body: Record<string, unknown> = {};
+    formData.forEach((val, key) => {
+      body[key] = val;
+    });
+
+    fetch('http://localhost:8080/api/user/changepassword', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeader(csrf),
+      },
+      body: JSON.stringify(body),
+    }).then(handleResponse())
+      .then(() => invalidateCsrfToken(queryClient))
+      .then(() => {
+        setAlert({success: true, message: 'Password changed successfully'});
+        console.log('clear PW fields, notify user of password change');
+      })
+      .catch((e) => {
+        setAlert({success: false, message: e.message});
+      })
+      .finally(() => {
+        setSButtonDisabled(false);
+      });
   };
 
   const validateRepeatPassword = () => {
@@ -38,14 +78,22 @@ const PasswordChange: FC = () => {
       >
         Change Password
       </Typography>
+      {alert.message ? (
+        <Alert
+          severity={alert.success ? 'success' : 'error'}
+          sx={{ margin: 'auto' }}
+        >
+          {alert.message}
+        </Alert>
+      ) : null}
       <PasswordField
-        name='old'
+        name='password'
         label='Old password'
         sx={{ mb: 1 }}
       />
       <PasswordField
         strict
-        name='new'
+        name='newPassword'
         label='New password'
         inputRef={newPWRef}
         onBlur={validateRepeatPassword}
@@ -53,7 +101,7 @@ const PasswordChange: FC = () => {
       />
       <PasswordField
         strict
-        name='repeat'
+        name='repeatPassword'
         label='Repeat new password'
         helperText={!repeatValid && 'Passwords do not match'}
         error={!repeatValid}
@@ -61,7 +109,7 @@ const PasswordChange: FC = () => {
         onBlur={validateRepeatPassword}
         sx={{ mb: 1 }}
       />
-      <Button variant='outlined' type='submit'>Change password</Button>
+      <Button variant='outlined' type='submit' disabled={sButtonDisabled}>Change password</Button>
     </Box>
   );
 };
@@ -98,6 +146,14 @@ const AccountDeletion: FC = () => {
 };
 
 export default function Profile() {
+  const { isAuthenticated } = useUser();
+  const router = useRouter();
+
+  // Redirect an authorized user to the landing page
+  useEffect(() => {
+    if (!isAuthenticated) router.push('/');
+  });
+
   return (
     <ConfirmProvider>
       <Head>
