@@ -80,7 +80,7 @@ pub async fn delete_post(client: &Client, user_id: &Uuid, post_id: &Uuid) -> Res
 pub async fn delete_post_admin(client: &Client, post_id: &Uuid) -> Result<u64, DbError> {
     let result = client.execute(
         // language=postgresql
-        "DELETE FROM posts WHERE post_id=$2", &[post_id])
+        "DELETE FROM posts WHERE post_id=$1", &[post_id])
         .await
         .map_err(|err| {
             debug!("Error while deleting post. {}", err);
