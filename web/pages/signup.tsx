@@ -18,6 +18,11 @@ import { FrontendUser } from '@/types/api/user';
 import { useUser } from '@/utils/useUser';
 import { PasswordField } from '@/components/PasswordField';
 
+
+/**
+ * Form for signing up a user. A username, password, and a unique email are required.
+ * The sig nup button is disabled if the user is already logged in or the user's account is being fetched.
+ */
 const SignUpForm: FC = () => {
   const [alert, setAlert] = useState('');
   const csrf = useCSRF();
@@ -46,12 +51,10 @@ const SignUpForm: FC = () => {
       .then(setUser)
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
-        console.log('account created succesfully');
         setAlert('');
         return router.push('/');
       })
       .catch((e) => {
-        console.log(`account creation failed ${e}`);
         setAlert(e.message);
       });
   };
@@ -108,6 +111,11 @@ const SignUpForm: FC = () => {
     </Box>
   );
 };
+
+/**
+ * Sign up page.
+ * Redirects to the landing page if the user is already logged in.
+ */
 export default function Signup() {
   const { isAuthenticated } = useUser();
   const router = useRouter();

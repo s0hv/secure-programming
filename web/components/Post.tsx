@@ -19,6 +19,10 @@ import { QueryKeys } from '@/utils/constants';
 import { handleResponse } from '@/types/api/utilities';
 
 
+/**
+ * Post component which shows a user's filled text along with the user's name and the time of the post's publication.
+ * Only the user who created the post, and an admin, can see the delete button and delete the post.
+ */
 export const Post: FC<PostProps> = ({ user, text, timestamp, postId }) => {
   const { user: currentUser } = useUser();
   const csrf = useCSRF();

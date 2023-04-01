@@ -29,6 +29,12 @@ import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import { handleResponse } from '@/types/api/utilities';
 
 
+/**
+ * Password change form, allowing the user to change their password.
+ * User is required to enter their current password to validate that the user themselves is
+ * performing the action. The new password must be entered twice to prevent typos.
+ * The submit button is disabled while the server is already processing the request.
+ */
 const PasswordChange: FC = () => {
   const [repeatValid, setRepeatValid] = useState(true);
   const newPWRef = useRef<HTMLInputElement>();
@@ -63,10 +69,11 @@ const PasswordChange: FC = () => {
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
         setAlert({ success: true, message: 'Password changed successfully' });
-        console.log('clear PW fields, notify user of password change');
+        console.log('clear PW fields');
       })
       .catch((e) => {
         setAlert({ success: false, message: e.message });
+        console.log('clear PW fields');
       })
       .finally(() => {
         setSButtonDisabled(false);
@@ -126,6 +133,11 @@ const PasswordChange: FC = () => {
   );
 };
 
+/**
+ * Account deletion procedure, which requires the user to both confirm their action by
+ * typing "delete <username>" and then enter their password to validate that the user themselves is
+ * performing the action.
+ */
 const AccountDeletion: FC = () => {
   const confirm = useConfirm();
   const { setUser, user } = useUser();
@@ -170,7 +182,6 @@ const AccountDeletion: FC = () => {
       .then(() => setUser(null))
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
-        console.log('redirect to landing page');
         return router.push('/');
       })
       .catch((e) => {
@@ -224,6 +235,10 @@ const AccountDeletion: FC = () => {
   );
 };
 
+/**
+ * Profile/account editing page.
+ * Redirects to landing page if user is not authenticated.
+ */
 export default function Profile() {
   const { isAuthenticated } = useUser();
   const router = useRouter();

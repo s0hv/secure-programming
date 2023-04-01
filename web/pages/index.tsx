@@ -21,6 +21,10 @@ import { handleResponse } from '@/types/api/utilities';
 import { QueryKeys } from '@/utils/constants';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 
+
+/**
+ * List of posts which are retrieved from the server and displayed.
+ */
 const Posts: FC = () => {
   const { data: posts, isFetching } = useQuery<PostProps[]>({
     queryKey: QueryKeys.posts,
@@ -70,6 +74,9 @@ const Posts: FC = () => {
   );
 };
 
+/**
+ * Button which initiates creating a post.
+ */
 const NewPostButton: FC = () => {
   const [open, setOpen] = useState(false);
   const [postValid, setPostValid] = useState(true);
@@ -92,7 +99,6 @@ const NewPostButton: FC = () => {
       setPostValid(false);
     } else {
       handleClose(event);
-      console.log(`Make a new post with userid, timestamp, and content: ${postText.current?.value}`);
       const body = {
         text: postText.current?.value,
       };
@@ -110,7 +116,6 @@ const NewPostButton: FC = () => {
         });
     }
   };
-
 
   return (
     <>
@@ -152,6 +157,11 @@ const NewPostButton: FC = () => {
   );
 };
 
+/**
+ * Landing (or Home) page of the application.
+ * The page shows the latest posts made by the users of the application
+ * and a button to create a new post for an authenticated user.
+ */
 export default function Home() {
   const { isAuthenticated } = useUser();
   return (

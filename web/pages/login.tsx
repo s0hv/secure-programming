@@ -18,6 +18,13 @@ import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import Link from '@/components/Link';
 import { PasswordField } from '@/components/PasswordField';
 
+
+/**
+ * Form for logging in a user, used to match an email with a password.
+ * If either the email is not in the database, or the password does not match,
+ * the user is alerted that one of them is invalid (but not which one specifically).
+ * The login button is disabled if the user is already logged in or the user's account is being fetched.
+ */
 const LoginForm: FC = () => {
   const PWRef = useRef<HTMLInputElement>();
   const [alert, setAlert] = useState(false);
@@ -101,6 +108,10 @@ const LoginForm: FC = () => {
   );
 };
 
+/**
+ * Page for logging in a user.
+ * Redirects to the landing page if the user is already logged in.
+ */
 export default function Login() {
   const { isAuthenticated } = useUser();
   const router = useRouter();
