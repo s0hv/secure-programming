@@ -7,15 +7,19 @@ import Link from '@/components/Link';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 
 
+/**
+ * Navigation Bar of the application meant to be shown on every page.
+ * Shown actions depend on whether the user is logged in or not.
+ */
 export const NavBar: FC = () => {
-  const { isAuthenticated, user, setUser } = useUser();
+  const { isAuthenticated, user, setUser, isAdmin } = useUser();
   const csrf = useCSRF();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const adminSuffix = isAdmin ? ' (admin)' : '';
 
   const logoutUser = (event: SyntheticEvent) => {
     event.preventDefault();
-    console.log('log the user out, take to landing page');
 
     fetch('http://localhost:8080/api/auth/logout', {
       method: 'POST',
@@ -46,14 +50,14 @@ export const NavBar: FC = () => {
             href='/'
             color='inherit'
             underline='none'
-            sx={{ flexGrow: 1 }}
           >
             App name or logo here
           </Typography>
+          <Typography sx={{ flexGrow: 1 }} />
           { isAuthenticated ? (
             <>
               <Typography variant='body2' sx={{ mr: 2 }}>
-                Logged in as {user?.username}
+                Logged in as {user?.username}{adminSuffix}
               </Typography>
               <Button color='inherit' href='/profile' component={Link}>Profile</Button>
               <Button color='inherit' onClick={logoutUser}>Logout</Button>
@@ -70,6 +74,3 @@ export const NavBar: FC = () => {
     </Box>
   );
 };
-
-
-
