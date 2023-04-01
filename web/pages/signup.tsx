@@ -5,7 +5,7 @@ import {
   Button,
   Container,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import { FC, FormEvent, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -90,6 +90,7 @@ const SignUpForm: FC = () => {
       />
       <PasswordField
         strict
+        meter
         name='password'
         label='Password'
         sx={{ mb: 2 }}

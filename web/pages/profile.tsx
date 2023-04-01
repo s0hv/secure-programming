@@ -17,7 +17,7 @@ import {
   SyntheticEvent,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react';
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
 import { useQueryClient } from '@tanstack/react-query';
@@ -100,15 +100,16 @@ const PasswordChange: FC = () => {
       <PasswordField
         name='password'
         label='Old password'
-        sx={{ mb: 1 }}
+        sx={{ mb: 2 }}
       />
       <PasswordField
         strict
+        meter
         name='newPassword'
         label='New password'
         inputRef={newPWRef}
         onBlur={validateRepeatPassword}
-        sx={{ mb: 1 }}
+        sx={{ mb: 2 }}
       />
       <PasswordField
         strict
@@ -118,7 +119,7 @@ const PasswordChange: FC = () => {
         error={!repeatValid}
         inputRef={repeatPWRef}
         onBlur={validateRepeatPassword}
-        sx={{ mb: 1 }}
+        sx={{ mb: 2 }}
       />
       <Button variant='outlined' type='submit' disabled={sButtonDisabled}>Change password</Button>
     </Box>
