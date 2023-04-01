@@ -1,11 +1,14 @@
-import { FC } from 'react';
+import { FC, SyntheticEvent, useState } from 'react';
 import {
   Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
-  Typography
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Typography,
 } from '@mui/material';
 import { type Post as PostProps } from '@/types/api/post';
 import { formatTimestamp } from '@/utils/utilities';
@@ -18,9 +21,9 @@ import { handleResponse } from '@/types/api/utilities';
 
 export const Post: FC<PostProps> = ({ user, text, timestamp, postId }) => {
   const { user: currentUser } = useUser();
-
   const csrf = useCSRF();
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
 
   const deletePost = () => {
     const suffix = currentUser?.admin ? `/admin` : ``;
@@ -41,27 +44,53 @@ export const Post: FC<PostProps> = ({ user, text, timestamp, postId }) => {
       });
   };
 
+  const handleOpen = (event: SyntheticEvent) => {
+    event.preventDefault();
+    setOpen(true);
+  };
+
+  const handleClose = (event: SyntheticEvent) => {
+    event.preventDefault();
+    setOpen(false);
+  };
+
   return (
-    <Card sx={{ width: 500 }}>
-      <CardHeader
-        title={user.username}
-        subheader={formatTimestamp(timestamp)}
-      />
-      <CardContent>
-        <Typography variant='body2' color='inherit'>
-          {text}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        {(currentUser?.userId === user.userId || currentUser?.admin) && (
+    <>
+      <Card sx={{ width: 500 }}>
+        <CardHeader
+          title={user.username}
+          subheader={formatTimestamp(timestamp)}
+        />
+        <CardContent>
+          <Typography variant='body2' color='inherit'>
+            {text}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          {(currentUser?.userId === user.userId || currentUser?.admin) && (
+            <Button
+              size='small'
+              color='primary'
+              onClick={handleOpen}
+            >Delete
+            </Button>
+          )}
+        </CardActions>
+      </Card>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle>Delete post?</DialogTitle>
+        <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button
-            size='small'
-            color='primary'
+            color='error'
             onClick={deletePost}
           >Delete
           </Button>
-        )}
-      </CardActions>
-    </Card>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
