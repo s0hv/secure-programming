@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from 'react';
-import { FrontendUser } from '@/types/api/user';
 import { useQueryClient } from '@tanstack/react-query';
+import { FrontendUser } from '@/types/api/user';
 import { QueryKeys } from '@/utils/constants';
 
 

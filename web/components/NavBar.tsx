@@ -1,10 +1,10 @@
 import { FC, SyntheticEvent } from 'react';
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
 import { useUser } from '@/utils/useUser';
 import Link from '@/components/Link';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
 
 
 export const NavBar: FC = () => {

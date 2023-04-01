@@ -8,13 +8,13 @@ import {
   Typography,
 } from '@mui/material';
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useQueryClient } from '@tanstack/react-query';
 import { NavBar } from '@/components/NavBar';
 import { handleResponse } from '@/types/api/utilities';
 import type { FrontendUser } from '@/types/api/user';
 import { useUser } from '@/utils/useUser';
-import { useRouter } from 'next/router';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
-import { useQueryClient } from '@tanstack/react-query';
 import Link from '@/components/Link';
 import { PasswordField } from '@/components/PasswordField';
 

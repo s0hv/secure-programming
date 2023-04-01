@@ -10,11 +10,11 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { type Post as PostProps } from '@/types/api/post';
 import { formatTimestamp } from '@/utils/utilities';
 import { useUser } from '@/utils/useUser';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
-import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/constants';
 import { handleResponse } from '@/types/api/utilities';
 

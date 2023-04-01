@@ -3,19 +3,30 @@ import {
   Alert,
   Box,
   Button,
-  Container, Dialog, DialogActions, DialogContent, DialogTitle,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
   Typography,
 } from '@mui/material';
-import { FC, FormEvent, SyntheticEvent, useEffect, useRef, useState } from 'react';
-import { NavBar } from '@/components/NavBar';
+import {
+  FC,
+  FormEvent,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
+import { NavBar } from '@/components/NavBar';
 import { useUser } from '@/utils/useUser';
 import { PasswordField } from '@/components/PasswordField';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
-import { useQueryClient } from '@tanstack/react-query';
 import { handleResponse } from '@/types/api/utilities';
-import { useRouter } from 'next/router';
 
 
 const PasswordChange: FC = () => {

@@ -3,6 +3,8 @@ module.exports = {
     'eslint:recommended',
     'next/core-web-vitals',
     'plugin:react/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
     'plugin:@typescript-eslint/recommended',
     'airbnb',
   ],
@@ -62,6 +64,16 @@ module.exports = {
       'warn', {
         argsIgnorePattern: '^_',
         ignoreRestSiblings: true,
+      },
+    ],
+    'import/order': [
+      'error',
+      {
+        groups: [
+          ['builtin', 'external'],
+          ['internal', 'unknown', 'parent', 'sibling', 'index'],
+        ],
+        alphabetize: { order: 'ignore', caseInsensitive: true },
       },
     ],
 

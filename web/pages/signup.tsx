@@ -1,14 +1,21 @@
 import Head from 'next/head';
-import { Alert, Box, Button, Container, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography
+} from '@mui/material';
 import { FC, FormEvent, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
 import { NavBar } from '@/components/NavBar';
 import Link from '@/components/Link';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
-import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/utils/useUser';
-import { useRouter } from 'next/router';
 import { PasswordField } from '@/components/PasswordField';
 
 const SignUpForm: FC = () => {

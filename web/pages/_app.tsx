@@ -5,15 +5,15 @@ import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import createEmotionCache from '@/utils/createEmotionCache';
-import { theme } from '@/utils/theme';
-import { type UserContextValue, UserProvider } from '@/utils/useUser';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import createEmotionCache from '@/utils/createEmotionCache';
+import { theme } from '@/utils/theme';
+import { type UserContextValue, UserProvider } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
 import { QueryKeys } from '@/utils/constants';

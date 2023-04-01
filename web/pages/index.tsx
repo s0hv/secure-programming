@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import { NavBar } from '@/components/NavBar';
 import { FC, SyntheticEvent, useRef, useState } from 'react';
 import {
   Button,
@@ -13,11 +12,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { NavBar } from '@/components/NavBar';
 import { Post } from '@/components/Post';
 import { type Post as PostProps } from '@/types/api/post';
 import { useUser } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/constants';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 
