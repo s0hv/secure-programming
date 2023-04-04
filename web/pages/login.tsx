@@ -27,7 +27,7 @@ import { PasswordField } from '@/components/PasswordField';
  */
 const LoginForm: FC = () => {
   const PWRef = useRef<HTMLInputElement>();
-  const [alert, setAlert] = useState(false);
+  const [alert, setAlert] = useState('');
   const queryClient = useQueryClient();
   const router = useRouter();
   const { setUser, isLoading, isAuthenticated } = useUser();
@@ -54,13 +54,12 @@ const LoginForm: FC = () => {
       .then(setUser)
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
-        setAlert(false);
+        setAlert('');
         return router.push('/');
       })
       .catch((e) => {
-        console.log(e);
         PWRef.current!.value = '';
-        setAlert(true);
+        setAlert(e.message);
       });
   };
 
@@ -83,9 +82,9 @@ const LoginForm: FC = () => {
       {alert ? (
         <Alert
           severity='error'
-          sx={{ margin: 'auto' }}
+          sx={{ margin: 'auto', whiteSpace: 'pre-line' }}
         >
-          Login failed; Invalid email or password.
+          Login failed; Invalid email or password.{'\n'}({alert})
         </Alert>
       ) : null}
       <TextField
