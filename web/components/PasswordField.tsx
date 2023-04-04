@@ -22,7 +22,7 @@ export const PasswordField: FC<{strict?: boolean, meter?: boolean} & ComponentPr
         onChange={(e) => setPassword(e.target.value)}
         {...props}
       />
-      {meter && password.length > 0 ? (
+      {meter ? (
         <Box sx={{ ml: 1, mr: 1 }}>
           <PasswordStrengthBar password={password} minLength={8} />
         </Box>
