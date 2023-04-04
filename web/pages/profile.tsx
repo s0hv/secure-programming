@@ -37,6 +37,7 @@ import { handleResponse } from '@/types/api/utilities';
  */
 const PasswordChange: FC = () => {
   const [repeatValid, setRepeatValid] = useState(true);
+  const PWRef = useRef<HTMLInputElement>();
   const newPWRef = useRef<HTMLInputElement>();
   const repeatPWRef = useRef<HTMLInputElement>();
   const csrf = useCSRF();
@@ -69,14 +70,15 @@ const PasswordChange: FC = () => {
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
         setAlert({ success: true, message: 'Password changed successfully' });
-        console.log('clear PW fields');
       })
       .catch((e) => {
         setAlert({ success: false, message: e.message });
-        console.log('clear PW fields');
       })
       .finally(() => {
         setSButtonDisabled(false);
+        PWRef.current!.value = '';
+        newPWRef.current!.value = '';
+        repeatPWRef.current!.value = '';
       });
   };
 
@@ -107,6 +109,7 @@ const PasswordChange: FC = () => {
       <PasswordField
         name='password'
         label='Old password'
+        inputRef={PWRef}
         sx={{ mb: 2 }}
       />
       <PasswordField

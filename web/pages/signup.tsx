@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { FC, FormEvent, useEffect, useState } from 'react';
+import {FC, FormEvent, useEffect, useRef, useState} from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { NavBar } from '@/components/NavBar';
@@ -24,6 +24,7 @@ import { PasswordField } from '@/components/PasswordField';
  * The sig nup button is disabled if the user is already logged in or the user's account is being fetched.
  */
 const SignUpForm: FC = () => {
+  const PWRef = useRef<HTMLInputElement>();
   const [alert, setAlert] = useState('');
   const csrf = useCSRF();
   const queryClient = useQueryClient();
@@ -55,6 +56,7 @@ const SignUpForm: FC = () => {
         return router.push('/');
       })
       .catch((e) => {
+        PWRef.current!.value = '';
         setAlert(e.message);
       });
   };
@@ -96,6 +98,7 @@ const SignUpForm: FC = () => {
         meter
         name='password'
         label='Password'
+        inputRef={PWRef}
         sx={{ mb: 2 }}
       />
       <TextField

@@ -59,9 +59,7 @@ const LoginForm: FC = () => {
       })
       .catch((e) => {
         console.log(e);
-        if (PWRef.current) {
-          PWRef.current.value = '';
-        }
+        PWRef.current!.value = '';
         setAlert(true);
       });
   };
