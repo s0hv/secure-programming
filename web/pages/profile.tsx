@@ -158,8 +158,6 @@ const AccountDeletion: FC = () => {
     })
       .then(() => {
         setOpen(true);
-      }).catch(() => {
-        console.log('Cancelled account deletion');
       });
   };
 

@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {FC, FormEvent, useEffect, useRef, useState} from 'react';
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { NavBar } from '@/components/NavBar';
