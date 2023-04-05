@@ -1,5 +1,5 @@
 # General description
- How the program is used and to what purpose and describtion of user interface especially form those parts that are not self-evident.
+ How the program is used and to what purpose and description of user interface especially form those parts that are not self-evident.
  
 # Structure of the program
  
@@ -91,12 +91,16 @@ The application does not support the uploading of files, including XML documents
 The application does not construct code segments based on user given data.
 
 # Testing
-ou should include at least manual security testing, but it is highly recommended to do more extensive testing. Report testing and also what you found and what you fixed based on testing.
+You should include at least manual security testing, but it is highly recommended
+to do more extensive testing. Report testing and also what you found and what you fixed based on testing.
 
 # Misc
 In case something was not yet implemented, document that as well.
 If you know there is security issue or vulnerability, document that as well.
 Suggestions for improvement, what could be implemented.
+
+As mentioned in the SANS checklist above, rate limitation would help against
+DOS attacks and brute forcing.
 
 The application is currently missing Multi-Factor Authentication. A new user
 is instantly logged in after registering, but ideally they would first get
