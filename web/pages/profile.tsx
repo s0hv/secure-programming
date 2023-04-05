@@ -27,6 +27,7 @@ import { useUser } from '@/utils/useUser';
 import { PasswordField } from '@/components/PasswordField';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import { handleResponse } from '@/types/api/utilities';
+import { appPath } from '@/utils/constants';
 
 
 /**
@@ -58,7 +59,7 @@ const PasswordChange: FC = () => {
       body[key] = val;
     });
 
-    fetch('http://localhost:8080/api/user/changepassword', {
+    fetch(`${appPath}/api/user/changepassword`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -171,7 +172,7 @@ const AccountDeletion: FC = () => {
       body[key] = val;
     });
 
-    fetch('http://localhost:8080/api/user/deleteaccount', {
+    fetch(`${appPath}/api/user/deleteaccount`, {
       method: 'DELETE',
       credentials: 'include',
       headers: {

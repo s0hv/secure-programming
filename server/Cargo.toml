@@ -7,11 +7,16 @@ edition = "2021"
 name = "migrate-up"
 path = "src/db/migrate-up.rs"
 
+[profile.release]
+debug-assertions = false
+strip = true
+
 [dependencies]
 actix-web = "4"
 actix-session = "0.7.2"
 actix-cors = "0.6.4"
 actix-web-validator = "5.0.1"
+actix-files = "0.6.2"
 validator = { version = "0.16", features = ["derive"] }
 tokio-postgres = { version = "0.7.7", features = ["with-serde_json-1", "with-uuid-0_8", "with-chrono-0_4"] }
 tokio-util = "0.7.7"

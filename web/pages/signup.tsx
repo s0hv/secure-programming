@@ -17,6 +17,7 @@ import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
 import { useUser } from '@/utils/useUser';
 import { PasswordField } from '@/components/PasswordField';
+import { appPath } from '@/utils/constants';
 
 
 /**
@@ -40,7 +41,7 @@ const SignUpForm: FC = () => {
       body[key] = val;
     });
 
-    fetch('http://localhost:8080/api/user/createaccount', {
+    fetch(`${appPath}/api/user/createaccount`, {
       method: 'POST',
       credentials: 'include',
       headers: {

@@ -16,7 +16,7 @@ import { theme } from '@/utils/theme';
 import { type UserContextValue, UserProvider } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
 import { FrontendUser } from '@/types/api/user';
-import { QueryKeys } from '@/utils/constants';
+import { appPath, QueryKeys } from '@/utils/constants';
 import { csrfHeader, CSRFProvider } from '@/utils/useCsrf';
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -38,7 +38,7 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
   const { data: csrf } = useQuery({
     queryKey: QueryKeys.csrf,
     retry: false,
-    queryFn: () => fetch('http://localhost:8080/api/auth/csrf', {
+    queryFn: () => fetch(`${appPath}/api/auth/csrf`, {
       method: 'POST',
       credentials: 'include',
     })
@@ -51,7 +51,7 @@ const Root: FC<PropsWithChildren> = ({ children }) => {
     queryKey: QueryKeys.user,
     retry: false,
     enabled: !csrfLoading,
-    queryFn: () => fetch('http://localhost:8080/api/user/authenticate', {
+    queryFn: () => fetch(`${appPath}/api/user/authenticate`, {
       method: 'POST',
       credentials: 'include',
       headers: csrfHeader(csrf),

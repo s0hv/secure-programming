@@ -18,7 +18,7 @@ import { Post } from '@/components/Post';
 import { type Post as PostProps } from '@/types/api/post';
 import { useUser } from '@/utils/useUser';
 import { handleResponse } from '@/types/api/utilities';
-import { QueryKeys } from '@/utils/constants';
+import { appPath, QueryKeys } from '@/utils/constants';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 
 
@@ -29,7 +29,7 @@ const Posts: FC = () => {
   const { data: posts, isFetching } = useQuery<PostProps[]>({
     queryKey: QueryKeys.posts,
     initialData: [],
-    queryFn: () => fetch('http://localhost:8080/api/posts', {
+    queryFn: () => fetch(`${appPath}/api/posts`, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -102,7 +102,7 @@ const NewPostButton: FC = () => {
       const body = {
         text: postText.current?.value,
       };
-      fetch('http://localhost:8080/api/posts/create', {
+      fetch(`${appPath}/api/posts/create`, {
         method: 'POST',
         credentials: 'include',
         headers: {

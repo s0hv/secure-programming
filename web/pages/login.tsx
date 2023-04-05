@@ -17,6 +17,7 @@ import { useUser } from '@/utils/useUser';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
 import Link from '@/components/Link';
 import { PasswordField } from '@/components/PasswordField';
+import { appPath } from '@/utils/constants';
 
 
 /**
@@ -42,7 +43,7 @@ const LoginForm: FC = () => {
       body[key] = val;
     });
 
-    fetch('http://localhost:8080/api/auth/login', {
+    fetch(`${appPath}/api/auth/login`, {
       method: 'POST',
       credentials: 'include',
       headers: {

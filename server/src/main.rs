@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_session::config::PersistentSession;
 use actix_session::SessionMiddleware;
 use actix_web::{App, HttpServer, web};
@@ -72,13 +73,7 @@ async fn main() -> std::io::Result<()> {
     let json_config = api::errors::generate_json_config();
 
     HttpServer::new(move || {
-        #[cfg(debug_assertions)]
-        let cors = Cors::permissive();
-
-        #[cfg(not(debug_assertions))]
-        let cors = Cors::default();
-
-        App::new()
+        let app = App::new()
             .app_data(web::Data::new(AppState {
                 pool: pool.clone()
             }))
@@ -92,11 +87,21 @@ async fn main() -> std::io::Result<()> {
                 .session_lifecycle(PersistentSession::default())
                 .build()
             )
-            .wrap(cors)
             .wrap(Logger::default())
             .service(web::scope("/api/auth").configure(api::auth::config))
             .service(web::scope("/api/posts").configure(api::posts::config))
-            .service(web::scope("/api/user").configure(api::user::config))
+            .service(web::scope("/api/user").configure(api::user::config));
+
+        #[cfg(not(debug_assertions))]
+        return app
+            .service(fs::Files::new("/", "../web/build")
+                .index_file("index.html")
+                .show_files_listing()
+                .prefer_utf8(true));
+
+        #[cfg(debug_assertions)]
+        return app
+            .wrap(Cors::permissive());
     })
     .bind(("127.0.0.1", 8080))?
     .run()

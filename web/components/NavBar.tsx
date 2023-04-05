@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useUser } from '@/utils/useUser';
 import Link from '@/components/Link';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
+import { appPath } from '@/utils/constants';
 
 
 /**
@@ -21,7 +22,7 @@ export const NavBar: FC = () => {
   const logoutUser = (event: SyntheticEvent) => {
     event.preventDefault();
 
-    fetch('http://localhost:8080/api/auth/logout', {
+    fetch(`${appPath}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
       redirect: 'manual',

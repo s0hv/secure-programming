@@ -15,7 +15,7 @@ import { type Post as PostProps } from '@/types/api/post';
 import { formatTimestamp } from '@/utils/utilities';
 import { useUser } from '@/utils/useUser';
 import { csrfHeader, invalidateCsrfToken, useCSRF } from '@/utils/useCsrf';
-import { QueryKeys } from '@/utils/constants';
+import { appPath, QueryKeys } from '@/utils/constants';
 import { handleResponse } from '@/types/api/utilities';
 
 
@@ -31,7 +31,7 @@ export const Post: FC<PostProps> = ({ user, text, timestamp, postId }) => {
 
   const deletePost = () => {
     const suffix = currentUser?.admin ? `/admin` : ``;
-    fetch(`http://localhost:8080/api/posts/delete/${postId}${suffix}`, {
+    fetch(`${appPath}/api/posts/delete/${postId}${suffix}`, {
       method: 'DELETE',
       credentials: 'include',
       headers: {

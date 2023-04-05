@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next export",
+    "export": "pnpm run build && next export -o build",
     "eslint": "eslint --ext .jsx,.js,.ts,.tsx .",
     "eslint:fix": "eslint --ext .jsx,.js,.ts,.tsx --fix ."
   },
