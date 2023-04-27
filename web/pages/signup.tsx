@@ -49,7 +49,7 @@ const SignUpForm: FC = () => {
         ...csrfHeader(csrf),
       },
       body: JSON.stringify(body),
-    }).then(handleResponse<FrontendUser>())
+    }).then(handleResponse<FrontendUser>('user'))
       .then(setUser)
       .then(() => invalidateCsrfToken(queryClient))
       .then(() => {
